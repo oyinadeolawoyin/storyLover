@@ -127,7 +127,7 @@ export default function Home() {
               Hi, I'm so glad you're here.
             </h1>
             <p className="mt-5 max-w-lg text-lg leading-relaxed text-foreground/85 md:text-xl">
-              I'm Oyin. I created this blog for writers who are tired of guessing why a story isn't working
+              I'm Oyinade. I created this blog for writers who are tired of guessing why a story isn't working
               and want to use the psychology of storytelling to hook their readers and keep them turning
               the pages.
             </p>
@@ -144,7 +144,7 @@ export default function Home() {
           {/* Put your hero illustration at public/hero-home.png */}
           {heroOk && (
             <img
-              src="/hero-home.png"
+              src="/hero-home.jpg"
               alt=""
               onError={() => setHeroOk(false)}
               className="mx-auto w-full max-w-lg rounded-2xl object-cover"
@@ -331,7 +331,7 @@ export default function Home() {
                 </div>
               )}
               <div className="text-center sm:text-left">
-                <h2 className="hand text-3xl">Hi, I'm Oyin</h2>
+                <h2 className="hand text-3xl">Hi, I'm Oyinade</h2>
                 <p className="mt-2 max-w-xl leading-relaxed text-foreground/80">
                   I'm a writer who studies storytelling, writes stories, and shares what I learn along the way.
                 </p>

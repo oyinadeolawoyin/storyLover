@@ -418,8 +418,7 @@ function ShareBox({ title, image, slug }) {
     <section className="mt-12 rounded-xl border border-border bg-sky-soft p-6 text-center sm:p-8">
       <h2 className="hand text-4xl leading-none">Know a writer who needs this?</h2>
       <p className="mx-auto mt-3 max-w-md leading-relaxed text-foreground/80">
-        Someone out there may be struggling with their story right now. Sharing this could be the help
-        they needed.
+        A friend or a fellow writer out there may be stuck on their story right now. Sharing this could be the help they need.
       </p>
 
       <div className="mt-6 flex flex-wrap items-center justify-center gap-3">

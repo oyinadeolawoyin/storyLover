@@ -250,19 +250,29 @@ export default function About() {
             </div>
           </div>
 
-          {/* Put your photo at public/oyin.jpg */}
-          {photoOk ? (
-            <img
-              src="/oyin.jpg"
-              alt="Oyinade"
-              onError={() => setPhotoOk(false)}
-              className="mx-auto aspect-[4/5] w-full max-w-sm rounded-2xl object-cover shadow-soft md:ml-auto"
+          {/* Your handwritten name art lives at public/oyin.jpg.
+              It is tilted and taped like the sticky notes on the home page, and straightens when you hover. */}
+          <div className="relative mx-auto w-full max-w-xl rotate-2 transition-transform duration-300 hover:rotate-0 motion-reduce:transition-none md:ml-auto">
+            {/* a little piece of tape */}
+            <span
+              aria-hidden="true"
+              className="absolute -top-3 left-1/2 z-10 h-7 w-28 -translate-x-1/2 -rotate-3 border border-amber-300/50 bg-amber-200/80 shadow-sm"
             />
-          ) : (
-            <div className="hand mx-auto flex aspect-[4/5] w-full max-w-sm items-center justify-center rounded-2xl bg-primary/15 text-8xl md:ml-auto">
-              O
-            </div>
-          )}
+            {photoOk ? (
+              <img
+                src="/oyin.jpg"
+                alt="Oyinade written in handwritten lettering, surrounded by small drawings of flowers, a crown, a coffee cup, a moon and stars"
+                width="855"
+                height="730"
+                onError={() => setPhotoOk(false)}
+                className="h-auto w-full rounded-2xl shadow-soft"
+              />
+            ) : (
+              <div className="hand flex aspect-[7/6] w-full items-center justify-center rounded-2xl bg-primary/15 text-8xl">
+                Oyinade
+              </div>
+            )}
+          </div>
         </div>
       </section>
 

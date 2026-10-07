@@ -24,7 +24,7 @@ export default function AuthorCard({ className }) {
           </div>
         )}
         <p className="text-sm leading-relaxed text-foreground/80">
-          I'm <strong>Oyin</strong>,  a writer who studies storytelling, writes stories, and shares what I learn along the way.
+          I'm <strong>Oyinade</strong>,  a writer who studies storytelling, writes stories, and shares what I learn along the way.
         </p>
       </div>
 
