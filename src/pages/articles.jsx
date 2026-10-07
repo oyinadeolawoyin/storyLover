@@ -131,7 +131,7 @@ export default function Articles() {
             </h1>
             {!slug && (
               <p className="mt-5 max-w-md text-lg leading-relaxed text-foreground/80">
-                Tips, ideas, and honest thoughts about storytelling and the process of becoming a better writer.
+                Tips, ideas, and thoughts about storytelling and the process of writing.
               </p>
             )}
           </div>

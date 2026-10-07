@@ -21,7 +21,7 @@ function setMeta(attr, key, content) {
  */
 export default function Seo({ title, description = DEFAULT_DESCRIPTION, image, type = 'website', noindex = false }) {
   useEffect(() => {
-    const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} | Better stories together`
+    const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} | Create a story that moves your readers`
     const url = window.location.origin + window.location.pathname
     const img = image || `${window.location.origin}/og-default.png`
 
