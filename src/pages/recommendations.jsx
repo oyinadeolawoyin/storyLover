@@ -4,7 +4,7 @@ import { RecommendationService } from '@/service/recommendationService'
 import { RECOMMENDATION_LINK_COLUMN } from '@/lib/siteConfig'
 import { categoryTone } from '@/components/categoryPill'
 import SectionHeading from '@/components/sectionHeading'
-import SubscribeForm from '@/components/subscribeForm'
+import CheckerCta from '@/components/checkerCta'
 import Seo from '@/components/seo'
 import { cn } from '@/lib/utils'
 
@@ -137,7 +137,7 @@ export default function Recommendations() {
 
       {/* ---------- Newsletter ---------- */}
       <section className={`${container} pb-16`}>
-        <SubscribeForm wide />
+        <CheckerCta wide />
       </section>
     </div>
   )

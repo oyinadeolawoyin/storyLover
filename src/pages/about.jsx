@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { BookOpen, Bookmark, ChevronLeft, ChevronRight, Coffee, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import SectionHeading from '@/components/sectionHeading'
-import SubscribeForm from '@/components/subscribeForm'
+import CheckerCta from '@/components/checkerCta'
 import Seo from '@/components/seo'
 
 const container = 'mx-auto max-w-7xl px-4 sm:px-6'
@@ -304,7 +304,7 @@ export default function About() {
 
       {/* ---------- Newsletter ---------- */}
       <section className={`${container} py-16`}>
-        <SubscribeForm wide />
+        <CheckerCta wide />
       </section>
     </div>
   )

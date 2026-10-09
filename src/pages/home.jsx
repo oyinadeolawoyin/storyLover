@@ -8,7 +8,7 @@ import SectionHeading from '@/components/sectionHeading'
 import { formatDate } from '@/components/articleCard'
 import CategoryPill from '@/components/categoryPill'
 import { NAV_ONLY_SLUGS } from '@/lib/siteConfig'
-import SubscribeForm from '@/components/subscribeForm'
+import CheckerCta from '@/components/checkerCta'
 import Seo from '@/components/seo'
 
 const EXPLORE_STYLES = [
@@ -272,8 +272,10 @@ export default function Home() {
                 ))}
               </div>
             )}
+          </section>
 
-            <SubscribeForm className="mx-auto mt-14 max-w-2xl" />
+          <section className={`${container} pb-14`}>
+            <CheckerCta wide />
           </section>
 
           {/* ---------- 5. Explore the blog ---------- */}

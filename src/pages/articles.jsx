@@ -6,7 +6,7 @@ import { CategoryService } from '@/service/categoryService'
 import { NAV_ONLY_SLUGS } from '@/lib/siteConfig'
 import { Input } from '@/components/ui/input'
 import ArticleCard from '@/components/articleCard'
-import SubscribeForm from '@/components/subscribeForm'
+import CheckerCta from '@/components/checkerCta'
 import AuthorCard from '@/components/authorCard'
 import { categoryTone } from '@/components/categoryPill'
 import Seo from '@/components/seo'
@@ -237,7 +237,7 @@ export default function Articles() {
 
       {/* ---------- Newsletter, full width at the bottom ---------- */}
       <section className={`${container} pb-16`}>
-        <SubscribeForm wide />
+        <CheckerCta wide />
       </section>
     </div>
   )

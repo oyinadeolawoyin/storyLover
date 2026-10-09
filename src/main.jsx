@@ -16,6 +16,7 @@ import AdminRecommendations from './pages/admin/adminRecommendations'
 import AdminCategories from './pages/admin/adminCategories'
 import AdminSubscribers from './pages/admin/adminSubscribers'
 import AdminRoute from './components/adminRoutes'
+import StoryChecker from './pages/storyChecker'
 
 const router = createBrowserRouter([
   // Public site: every page here gets the header and footer
@@ -29,6 +30,7 @@ const router = createBrowserRouter([
       { path: '/posts/:slug', element: <Post /> },
       { path: '/recommendations', element: <Recommendations /> },
       { path: '/about', element: <About /> },
+      { path: '/story-clarity-checker', element: <StoryChecker /> },
       // Anything that does not match above
       { path: '*', element: <NotFound /> },
     ],

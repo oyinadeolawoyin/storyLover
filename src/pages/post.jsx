@@ -4,7 +4,7 @@ import { ArrowRight, Check, Lightbulb, Link as LinkIcon } from 'lucide-react'
 import { PostService } from '@/service/postService'
 import MarkdownContent from '@/components/markdownContent'
 import CategoryPill from '@/components/categoryPill'
-import SubscribeForm from '@/components/subscribeForm'
+import CheckerCta from '@/components/checkerCta'
 import AuthorCard from '@/components/authorCard'
 import ArticleCard, { formatDate } from '@/components/articleCard'
 import SectionHeading from '@/components/sectionHeading'
@@ -304,7 +304,7 @@ export default function Post() {
         <p className="hand mb-8 text-center text-3xl text-foreground/80">
           You made it to the end. Thank you for reading.
         </p>
-        <SubscribeForm wide />
+        <CheckerCta wide />
       </section>
 
       {/* ---------- More to read: a mix of categories ---------- */}
