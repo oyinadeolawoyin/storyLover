@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input'
 import Seo from '@/components/seo'
 import ShareButtons from '@/components/shareButtons'
 import { InlineSubscribe } from '@/components/checkerCta'
+import { AnalyticsService } from '@/service/analyticsService'
 import { CheckerFeedbackService } from '@/service/checkerFeedbackService'
 import { clearDraft, hasRated, isSubscribed, loadDraft, markRated, markTried, saveDraft } from '@/lib/checkerState'
 import { cn } from '@/lib/utils'
@@ -347,6 +348,7 @@ const markStyle = (color) => ({
 // A colourful, easy-to-read report: a bold header, the story on a taped page, an "at a glance" row,
 // one coloured block per part of the story, what's left to figure out, and the full answers.
 async function downloadPdf(answers) {
+  AnalyticsService.checkerPdf()
   const { jsPDF } = await import('jspdf')
   const doc = new jsPDF({ unit: 'pt', format: 'a4' })
   const W = doc.internal.pageSize.getWidth()
@@ -775,12 +777,51 @@ export default function StoryChecker() {
     if (step === RESULT) markTried()
   }, [step])
 
+  // Analytics: count each question as it is shown, so the drop-off between questions is visible.
+  // Editing a single answer from the results isn't counted.
+  useEffect(() => {
+    if (step >= 1 && step <= N && !fromResult) {
+      AnalyticsService.checkerQuestion({ number: step, key: STEPS[step - 1].key })
+    }
+  }, [step]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Analytics: if someone leaves while still on a question, record which one.
+  const lastStep = useRef(step)
+  useEffect(() => {
+    lastStep.current = step
+  }, [step])
+  useEffect(() => {
+    let sent = false
+    const send = () => {
+      const s = lastStep.current
+      if (sent || s < 1 || s > N) return
+      sent = true
+      AnalyticsService.checkerExit({ number: s, key: STEPS[s - 1].key })
+    }
+    window.addEventListener('pagehide', send)
+    return () => {
+      window.removeEventListener('pagehide', send)
+      send() // also covers leaving for another page of the site
+    }
+  }, [])
+
   const set = (key, value) => setAnswers((a) => ({ ...a, [key]: value }))
   const go = (to) => {
+    // Reaching the results straight from the last question counts as finishing
+    if (to === RESULT && step >= 1 && step <= N && !fromResult) {
+      const answered = STEPS.filter((s) => answerText(s, answers)).length
+      AnalyticsService.checkerFinish({ answered, blanks: N - answered, ending: answers.ending ?? 'none' })
+    }
     setDir(to > step ? 1 : -1)
     setStep(to)
     if (to === RESULT) setFromResult(false)
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+  const next = () => {
+    if (!fromResult && current && !answerText(current, answers)) {
+      AnalyticsService.checkerSkip({ number: step, key: current.key })
+    }
+    go(fromResult ? RESULT : step + 1)
   }
   const edit = (to) => {
     setFromResult(true)
@@ -877,7 +918,14 @@ export default function StoryChecker() {
                       })}
                     </div>
 
-                    <Button size="lg" className="mt-6 rounded-full px-6" onClick={() => go(1)}>
+                    <Button
+                      size="lg"
+                      className="mt-6 rounded-full px-6"
+                      onClick={() => {
+                        AnalyticsService.checkerStart({ resumed: filledCount > 0, answered: filledCount })
+                        go(1)
+                      }}
+                    >
                       {filledCount > 0 ? 'Continue where I left off' : 'Start'}
                       <ArrowRight className="size-4" />
                     </Button>
@@ -973,7 +1021,7 @@ export default function StoryChecker() {
                       size="lg"
                       variant={answerText(current, answers) ? 'default' : 'outline'}
                       className="rounded-full px-6"
-                      onClick={() => go(fromResult ? RESULT : step + 1)}
+                      onClick={next}
                     >
                       {fromResult
                         ? answerText(current, answers) ? 'Update my story so far' : 'Back to my story so far'
@@ -1230,6 +1278,7 @@ export default function StoryChecker() {
                         </p>
                         <div className="mt-4 max-w-xl">
                           <InlineSubscribe
+                            source="result"
                             buttonLabel="Get the PDF"
                             onDone={() => {
                               setSubscribed(true)
@@ -1297,6 +1346,7 @@ function Feedback({ answers }) {
       const { name, ...rest } = answers // the character's name is never sent
       await CheckerFeedbackService.submit({ rating, comment, email, answers: shareAnswers ? rest : null })
       markRated()
+      AnalyticsService.checkerRating({ rating })
       setStatus('done')
     } catch (err) {
       console.error(err)

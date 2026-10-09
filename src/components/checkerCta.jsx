@@ -4,11 +4,12 @@ import { Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { SubscriberService } from '@/service/subscriberService'
+import { AnalyticsService } from '@/service/analyticsService'
 import { hasTried, isSubscribed, markSubscribed } from '@/lib/checkerState'
 import { cn } from '@/lib/utils'
 
 // A small email form that also remembers, in this browser, that the visitor has subscribed.
-export function InlineSubscribe({ onDone, buttonLabel = 'Subscribe' }) {
+export function InlineSubscribe({ onDone, buttonLabel = 'Subscribe', source = 'unknown' }) {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState('idle') // idle | sending | error
 
@@ -27,6 +28,7 @@ export function InlineSubscribe({ onDone, buttonLabel = 'Subscribe' }) {
       }
     }
     markSubscribed()
+    AnalyticsService.checkerSubscribe({ source })
     onDone?.()
   }
 
@@ -85,7 +87,12 @@ export default function CheckerCta({ wide = false, className = '' }) {
           </p>
         </div>
         <Button asChild size="lg" className="shrink-0 rounded-full px-6">
-          <Link to="/story-clarity-checker">Try the Story Clarity Checker</Link>
+          <Link
+            to="/story-clarity-checker"
+            onClick={() => AnalyticsService.checkerCtaClick({ from: window.location.pathname, mood: 'try' })}
+          >
+            Try the Story Clarity Checker
+          </Link>
         </Button>
       </div>
     )
@@ -102,7 +109,7 @@ export default function CheckerCta({ wide = false, className = '' }) {
           You also get new posts and writing tools by email, nothing else.
         </p>
         <div className="mt-5 max-w-xl">
-          <InlineSubscribe onDone={() => setSubscribed(true)} />
+          <InlineSubscribe source="cta" onDone={() => setSubscribed(true)} />
         </div>
       </div>
     )
@@ -117,7 +124,12 @@ export default function CheckerCta({ wide = false, className = '' }) {
         </p>
       </div>
       <Button asChild size="lg" variant="outline" className="shrink-0 rounded-full border-sky px-6 text-sky hover:text-sky">
-        <Link to="/story-clarity-checker">Open the checker</Link>
+        <Link
+          to="/story-clarity-checker"
+          onClick={() => AnalyticsService.checkerCtaClick({ from: window.location.pathname, mood: 'again' })}
+        >
+          Open the checker
+        </Link>
       </Button>
     </div>
   )
