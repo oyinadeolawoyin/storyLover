@@ -2,7 +2,7 @@
 
 An ongoing personal blog for writers who love stories. It shares the tricks of storytelling and the psychology behind it, to help writers build the right mindset for creating stories that move readers.
 
-**Live site:** [add link]
+**Live site:** [StoryLover](https://story-lover.vercel.app/)
 
 ![Home](./screenshots/home.png)
 ![Sound familiar](./screenshots/sound-familiar.png)
