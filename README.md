@@ -1,16 +1,49 @@
-# React + Vite
+# StoryLover
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An ongoing personal blog for writers who love stories. It shares the tricks of storytelling and the psychology behind it, to help writers build the right mindset for creating stories that move readers.
 
-Currently, two official plugins are available:
+**Live site:** [add link]
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+![Home](./screenshots/home.png)
+![Sound familiar](./screenshots/sound-familiar.png)
+![Story design](./screenshots/story-design.png)
 
-## React Compiler
+## What It Does
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+**For readers**
+- Browse published posts with search, category filters, and pagination
+- Read posts with related-post suggestions
+- Subscribe by email to get the weekly post and StoryLover updates
+- Try the Story Clarity Checker, a guided questionnaire with a downloadable PDF summary
+- Use the site on any screen size, since it is fully responsive
 
-## Expanding the ESLint configuration
+**For the admin**
+- Log in securely, then create, edit, publish, and delete posts
+- Upload images and videos for posts
+- View and manage subscribers
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Only the admin can post, edit, or delete content. Visitors can read and subscribe.
+
+## Tech Stack
+
+- **React 19** with **Vite**
+- **Tailwind CSS** and **shadcn/ui** for styling and components
+- **Supabase** for the database, authentication, and file storage
+- **React Router** for navigation
+
+## Running Locally
+
+This project needs a Supabase project with its own database setup, so it isn't a one-command install. To see it in action, visit the live site above.
+
+## Roadmap
+
+- [ ] Comment section
+- [ ] Schedule posts
+- [ ] Pin posts
+- [ ] Archive posts
+- [ ] Redesign the website
+
+## What I Learned
+
+- How to use Supabase as the backend, with its database, authentication, and storage, instead of building and hosting a separate server
+- How to write website copy that speaks to my audience and sounds like me, so the site connects with writers
