@@ -8,6 +8,7 @@ import ArticleCard from '@/components/articleCard'
 import AuthorCard from '@/components/authorCard'
 import { categoryTone } from '@/components/categoryPill'
 import Seo from '@/components/seo'
+import SubscribeForm from '@/components/subscribeForm'
 import { cn } from '@/lib/utils'
 
 const PAGE_SIZE = 6
@@ -27,7 +28,6 @@ export default function Articles() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [searchInput, setSearchInput] = useState(q)
-  const [heroOk, setHeroOk] = useState(true)
 
   // Categories and counts only need to load once
   useEffect(() => {
@@ -90,17 +90,13 @@ export default function Articles() {
     updateParams({ q: searchInput.trim() })
   }
 
-  // Filter chips: a soft colour per category, solid colour when chosen
-  const chipClass = (active, tone) =>
+  // Category rows (right sidebar): small rectangles, a soft colour per category, solid when chosen
+  const rowClass = (active, tone) =>
     cn(
-      'inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-all',
-      active ? cn(tone.active, 'shadow-soft') : cn(tone.chip, 'text-foreground/85 hover:-translate-y-0.5')
+      'flex items-center justify-between rounded-md border px-4 py-2.5 text-[12px] font-bold uppercase tracking-[0.12em] transition-colors',
+      active ? tone.active : cn(tone.chip, 'text-foreground/85')
     )
-  const countClass = (active) =>
-    cn(
-      'rounded-full px-2 py-0.5 text-xs font-bold',
-      active ? 'bg-white/30' : 'bg-white/80 text-muted-foreground'
-    )
+  const countClass = (active) => cn('text-xs font-bold tabular-nums', active ? 'opacity-80' : 'text-muted-foreground')
   const allTone = {
     chip: 'bg-card border-border hover:border-foreground/40',
     active: 'bg-foreground border-foreground text-background',
@@ -118,25 +114,17 @@ export default function Articles() {
       />
       {/* ---------- Hero ---------- */}
       <section className="bg-gradient-to-b from-butter-soft/60 to-background">
-        <div className={`${container} grid items-center gap-8 py-10 md:grid-cols-2 md:py-14`}>
-          <div>
-            <h1 className="text-4xl font-bold leading-tight md:text-6xl">
-              <span className="marker-yellow">{title}</span>
-            </h1>
-            {!slug && (
-              <p className="mt-5 max-w-md text-lg leading-relaxed text-foreground/80">
-                Tips, ideas, and thoughts about storytelling and the process of writing.
-              </p>
-            )}
-          </div>
-          {/* Put your hero illustration at public/hero-articles.png */}
-          {heroOk && (
-            <img
-              src="/hero-articles.png"
-              alt=""
-              onError={() => setHeroOk(false)}
-              className="mx-auto w-full max-w-lg rounded-2xl object-cover"
-            />
+        <div className={`${container} py-14 text-center md:py-20`}>
+          <h1 className="rise text-4xl font-bold leading-tight md:text-6xl">
+            <span className="marker-yellow">{title}</span>
+          </h1>
+          {!slug && (
+            <p
+              className="rise mx-auto mt-6 max-w-xl text-lg leading-relaxed text-foreground/80"
+              style={{ animationDelay: '150ms' }}
+            >
+              Tips, ideas, and thoughts about storytelling and the process of writing.
+            </p>
           )}
         </div>
       </section>
@@ -144,23 +132,6 @@ export default function Articles() {
       <div className={`${container} grid gap-10 pb-12 pt-8 lg:grid-cols-[minmax(0,1fr)_320px] xl:gap-12`}>
         {/* ---------- Main column ---------- */}
         <div className="min-w-0">
-          {/* Category chips */}
-          <div className="flex flex-wrap gap-3">
-              <Link to="/articles" className={chipClass(!slug, allTone)}>
-                All
-                <span className={countClass(!slug)}>{totalCount}</span>
-              </Link>
-              {categories.map((c) => {
-                const active = c.slug === slug
-                return (
-                  <Link key={c.id} to={`/category/${c.slug}`} className={chipClass(active, categoryTone(c.slug))}>
-                    {c.name}
-                    <span className={countClass(active)}>{counts[c.id] ?? 0}</span>
-                  </Link>
-                )
-              })}
-          </div>
-
           {/* Count + sort */}
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="text-muted-foreground">
@@ -223,9 +194,38 @@ export default function Articles() {
             />
           </form>
 
+          {/* Categories */}
+          <div className="rounded-xl border border-border bg-card p-5 shadow-soft">
+            <h2 className="hand text-3xl leading-none">Categories</h2>
+            <ul className="mt-4 space-y-2">
+              <li>
+                <Link to="/articles" className={rowClass(!slug, allTone)}>
+                  All
+                  <span className={countClass(!slug)}>{totalCount}</span>
+                </Link>
+              </li>
+              {categories.map((c) => {
+                const active = c.slug === slug
+                return (
+                  <li key={c.id}>
+                    <Link to={`/category/${c.slug}`} className={rowClass(active, categoryTone(c.slug))}>
+                      {c.name}
+                      <span className={countClass(active)}>{counts[c.id] ?? 0}</span>
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+
           <AuthorCard />
         </aside>
       </div>
+
+      {/* ---------- Newsletter ---------- */}
+      <section className={`${container} pb-14`}>
+        <SubscribeForm wide />
+      </section>
     </div>
   )
 }

@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { ArrowRight, Mail } from 'lucide-react'
 import { SubscriberService } from '@/service/subscriberService'
-import { markSubscribed } from '@/lib/checkerState'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
@@ -28,8 +27,7 @@ export default function SubscribeForm({ tone = 'rose', wide = false, className }
 
     try {
       setState('sending')
-      await SubscriberService.subscribe(email);
-      markSubscribed()
+      await SubscriberService.subscribe(email)
       setState('done')
       setMessage('Thank you for subscribing!')
       setEmail('')
@@ -40,7 +38,6 @@ export default function SubscribeForm({ tone = 'rose', wide = false, className }
       if (err.code === '23505') {
         setMessage('You are already on the list.')
       } else if (err.code === '23514') {
-        markSubscribed()
         setMessage('Please enter a valid email address.')
       } else {
         setMessage('Something went wrong. Please try again.')

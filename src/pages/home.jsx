@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { BookOpen, Brain, Lightbulb, LayoutGrid, Sparkles } from 'lucide-react'
 import { PostService } from '@/service/postService'
@@ -8,6 +8,8 @@ import SectionHeading from '@/components/sectionHeading'
 import { formatDate } from '@/components/articleCard'
 import CategoryPill from '@/components/categoryPill'
 import Seo from '@/components/seo'
+import Reveal from '@/components/reveal'
+import SubscribeForm from '@/components/subscribeForm'
 
 const EXPLORE_STYLES = [
   { bg: 'bg-rose-soft', icon: BookOpen },
@@ -27,45 +29,6 @@ const NOTES = [
 ]
 
 const container = 'mx-auto max-w-7xl px-4 sm:px-6'
-
-// Fades and slides an element in the first time it scrolls into view.
-// People whose device is set to "reduce motion" just see it, with no movement.
-function Reveal({ children, className = '', style, delay = 0 }) {
-  const ref = useRef(null)
-  const [shown, setShown] = useState(false)
-
-  useEffect(() => {
-    const el = ref.current
-    if (!el) return
-    let timer
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          timer = setTimeout(() => setShown(true), delay)
-          observer.disconnect()
-        }
-      },
-      { threshold: 0.2 }
-    )
-    observer.observe(el)
-    return () => {
-      observer.disconnect()
-      clearTimeout(timer)
-    }
-  }, [delay])
-
-  return (
-    <div
-      ref={ref}
-      style={style}
-      className={`transition-all duration-700 ease-out motion-reduce:translate-y-0 motion-reduce:opacity-100 motion-reduce:transition-none ${
-        shown ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
-      } ${className}`}
-    >
-      {children}
-    </div>
-  )
-}
 
 function StickyNote({ note, index }) {
   return (
@@ -89,7 +52,6 @@ export default function Home() {
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [heroOk, setHeroOk] = useState(true)
   const [authorOk, setAuthorOk] = useState(true)
 
   useEffect(() => {
@@ -118,36 +80,27 @@ export default function Home() {
       <Seo />
 
       {/* ---------- 1. Greeting and intro ---------- */}
-      <section className="bg-gradient-to-b from-butter-soft/60 to-background">
-        <div className={`${container} grid items-center gap-8 py-12 md:grid-cols-2 md:py-16`}>
-          <div>
-            <h1 className="hand text-4xl leading-tight text-sky md:text-5xl">
-              Hi, I'm so glad you're here.
-            </h1>
-            <p className="mt-5 max-w-lg text-lg leading-relaxed text-foreground/85 md:text-xl">
-              I'm Oyinade. I created this blog for writers who are tired of guessing why a story isn't working
-              and want to use the psychology of storytelling to hook their readers and keep them turning
-              the pages.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="rounded-full px-6">
-                <Link to="/articles">Start reading</Link>
-              </Button>
-              <Button asChild size="lg" variant="outline" className="rounded-full border-sky px-6 text-sky hover:text-sky">
-                <Link to="/about">About me</Link>
-              </Button>
-            </div>
+      <section className="bg-gradient-to-b from-butter-soft via-butter-soft/60 to-background">
+        <div className={`${container} py-20 text-center md:py-28`}>
+          <h1 className="rise hand text-5xl leading-tight text-sky md:text-7xl">
+            Hi, I'm so glad you're here.
+          </h1>
+          <p
+            className="rise mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-foreground/85 md:text-xl"
+            style={{ animationDelay: '150ms' }}
+          >
+            I'm Oyinade. I created this blog for fiction writers who are tired of guessing why a story isn't working
+            and want to use the psychology of storytelling to hook their readers and keep them turning
+            the pages.
+          </p>
+          <div className="rise mt-10 flex flex-wrap justify-center gap-3" style={{ animationDelay: '300ms' }}>
+            <Button asChild size="lg" className="rounded-full px-7">
+              <Link to="/articles">Start reading</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="rounded-full border-sky px-7 text-sky hover:text-sky">
+              <Link to="/about">About me</Link>
+            </Button>
           </div>
-
-          {/* Put your hero illustration at public/hero-home.png */}
-          {heroOk && (
-            <img
-              src="/hero-home.jpg"
-              alt=""
-              onError={() => setHeroOk(false)}
-              className="mx-auto w-full max-w-lg rounded-2xl object-cover"
-            />
-          )}
         </div>
       </section>
 
@@ -339,6 +292,11 @@ export default function Home() {
           </section>
         </>
       )}
+
+      {/* ---------- 7. Newsletter ---------- */}
+      <section className={`${container} py-14`}>
+        <SubscribeForm wide />
+      </section>
     </div>
   )
 }

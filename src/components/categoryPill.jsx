@@ -35,7 +35,7 @@ export function categoryTone(slug = '') {
 export default function CategoryPill({ category, link = false, className }) {
   if (!category) return null
   const classes = cn(
-    'inline-block rounded-md px-2.5 py-1 text-xs font-bold',
+    'inline-block rounded-sm px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.12em]',
     categoryTone(category.slug).pill,
     className
   )

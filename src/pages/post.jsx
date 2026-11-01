@@ -17,6 +17,7 @@ import AuthorCard from '@/components/authorCard'
 import ArticleCard, { formatDate } from '@/components/articleCard'
 import SectionHeading from '@/components/sectionHeading'
 import Seo from '@/components/seo'
+import SubscribeForm from '@/components/subscribeForm'
 import { useReadTracking } from '@/hooks/useReadTracking'
 import { AnalyticsService } from '@/service/analyticsService'
 
@@ -301,6 +302,11 @@ export default function Post() {
             {' '}— I’d love to hear from you.
           </p>
         </div>
+      </section>
+
+      {/* ---------- Newsletter ---------- */}
+      <section className={`${container} pb-16`}>
+        <SubscribeForm wide />
       </section>
 
       {/* ---------- More to read: a mix of categories ---------- */}

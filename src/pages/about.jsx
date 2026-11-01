@@ -4,6 +4,8 @@ import { BookOpen, Bookmark, ChevronLeft, ChevronRight, Coffee, Star } from 'luc
 import { Button } from '@/components/ui/button'
 import SectionHeading from '@/components/sectionHeading'
 import Seo from '@/components/seo'
+import Reveal from '@/components/reveal'
+import SubscribeForm from '@/components/subscribeForm'
 
 const container = 'mx-auto max-w-7xl px-4 sm:px-6'
 
@@ -215,8 +217,6 @@ function FunFactsCarousel() {
 }
 
 export default function About() {
-  const [photoOk, setPhotoOk] = useState(true)
-
   return (
     <div>
       <Seo
@@ -225,53 +225,70 @@ export default function About() {
       />
       {/* ---------- Intro ---------- */}
       <section className="bg-gradient-to-b from-butter-soft/60 to-background">
-        <div className={`${container} grid items-center gap-10 py-12 md:grid-cols-2 md:py-16`}>
-          <div>
-            <p className="hand text-2xl text-sky">Nice to meet you</p>
-            <h1 className="mt-2 text-4xl font-bold leading-tight md:text-6xl">
-              <span className="marker-yellow">Hi, I'm Oyinade</span>
-            </h1>
-            <div className="mt-6 max-w-lg space-y-4 text-lg leading-relaxed text-foreground/80">
-              <p>
-                I'm a mystery romance writer who loves exploring deep emotions, quiet moments, and the beauty of human connection. 
-              </p>
-              <p>I'm always curious about how stories work. How can we use science and psychology to pull readers into a story
-                world? How do we make readers root for our characters and cry with them? I love searching for the answers and sharing what I discover with writers who are as passionate as I am.
-              </p>
-              <p>
-                What fascinates me most is how deeply stories are tied to human nature. As writers, we can use stories to explore the darkest corners of the human heart, brighten someone's day, or simply help someone see the world a little differently.
-              </p>
-              <p>
-                I'd love to hear why you love stories. Share it with me using{' '}
-                <strong className="text-foreground">#StoryLovers</strong> on X, Threads, Tumblr and
-                Instagram.
-              </p>
-            </div>
-          </div>
+        <div className={`${container} py-16 text-center md:py-24`}>
+          <p className="rise hand text-2xl text-sky">Nice to meet you</p>
+          <h1 className="rise mt-3 text-4xl font-bold leading-tight md:text-6xl" style={{ animationDelay: '120ms' }}>
+            <span className="marker-yellow">Hi, I'm Oyinade</span>
+          </h1>
+        </div>
+      </section>
 
-          {/* Your handwritten name art lives at public/oyin.jpg.
-              It is tilted and taped like the sticky notes on the home page, and straightens when you hover. */}
-          <div className="relative mx-auto w-full max-w-xl rotate-2 transition-transform duration-300 hover:rotate-0 motion-reduce:transition-none md:ml-auto">
-            {/* a little piece of tape */}
-            <span
-              aria-hidden="true"
-              className="absolute -top-3 left-1/2 z-10 h-7 w-28 -translate-x-1/2 -rotate-3 border border-amber-300/50 bg-amber-200/80 shadow-sm"
-            />
-            {photoOk ? (
-              <img
-                src="/oyin.jpg"
-                alt="Oyinade written in handwritten lettering, surrounded by small drawings of flowers, a crown, a coffee cup, a moon and stars"
-                width="855"
-                height="730"
-                onError={() => setPhotoOk(false)}
-                className="h-auto w-full rounded-2xl shadow-soft"
-              />
-            ) : (
-              <div className="hand flex aspect-[7/6] w-full items-center justify-center rounded-2xl bg-primary/15 text-8xl">
-                Oyinade
-              </div>
-            )}
-          </div>
+      {/* ---------- My story, centred, each paragraph fades in as you scroll ---------- */}
+      <section className={`${container} pb-16 pt-4 md:pb-24`}>
+        <div className="mx-auto max-w-2xl space-y-10 text-center">
+          <Reveal>
+            <p className="font-heading text-2xl leading-relaxed text-foreground md:text-3xl">
+              I'm a mystery romance writer who loves exploring deep emotions, quiet moments, and the beauty of
+              human connection.
+            </p>
+          </Reveal>
+
+          <Reveal>
+            <div aria-hidden="true" className="mx-auto h-0.5 w-16 rounded-full bg-primary/60" />
+          </Reveal>
+
+          <Reveal>
+            <p className="text-lg leading-loose text-foreground/80 md:text-xl md:leading-loose">
+              I'm always curious about how stories work. How can we use science and psychology to pull readers
+              into a story world? How do we make readers root for our characters and cry with them? I love
+              searching for the answers and sharing what I discover with writers who are as passionate as I am.
+            </p>
+          </Reveal>
+
+          <Reveal>
+            <p className="text-lg leading-loose text-foreground/80 md:text-xl md:leading-loose">
+              What fascinates me most is how deeply stories are tied to human nature. As writers, we can use
+              stories to explore the darkest corners of the human heart, brighten someone's day, or simply help
+              someone see the world a little differently.
+            </p>
+          </Reveal>
+
+          <Reveal>
+            <p className="text-lg leading-loose text-foreground/80 md:text-xl md:leading-loose">
+              I'd love to hear why you love stories. Connect with me on{' '}
+              <a href="https://x.com/Tolageek" target="_blank" rel="noopener noreferrer" className="font-semibold text-sky underline-offset-4 hover:underline">
+                X
+              </a>
+              ,{' '}
+              <a href="https://www.instagram.com/oyinade_storylover/" target="_blank" rel="noopener noreferrer" className="font-semibold text-sky underline-offset-4 hover:underline">
+                Instagram
+              </a>{' '}
+              and{' '}
+              <a href="https://www.tumblr.com/oyinade-storylover" target="_blank" rel="noopener noreferrer" className="font-semibold text-sky underline-offset-4 hover:underline">
+                Tumblr
+              </a>
+              , or email me at{' '}
+              <a href="mailto:oyinadeolawoyin72@gmail.com" className="font-semibold text-sky underline-offset-4 hover:underline">
+                oyinadeolawoyin72@gmail.com
+              </a>
+              .
+            </p>
+            <p className="mt-6 text-lg leading-loose text-foreground/80 md:text-xl md:leading-loose">
+              Share your love of stories with the hashtag{' '}
+              <strong className="text-foreground">#StoryLoversCommunity</strong> on X, Tumblr, Instagram and
+              Threads.
+            </p>
+          </Reveal>
         </div>
       </section>
 
@@ -299,6 +316,11 @@ export default function About() {
             ))}
           </div>
         </div>
+      </section>
+
+      {/* ---------- Newsletter ---------- */}
+      <section className={`${container} py-12`}>
+        <SubscribeForm wide />
       </section>
     </div>
   )
