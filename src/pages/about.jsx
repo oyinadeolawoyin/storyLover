@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom'
 import { BookOpen, Bookmark, ChevronLeft, ChevronRight, Coffee, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import SectionHeading from '@/components/sectionHeading'
-import CheckerCta from '@/components/checkerCta'
 import Seo from '@/components/seo'
 
 const container = 'mx-auto max-w-7xl px-4 sm:px-6'
@@ -72,7 +71,7 @@ const FIND_HERE = [
     bg: 'bg-rose-soft',
   },
   {
-    to: '/recommendations',
+    to: '/category/recommendations',
     title: 'Recommendations',
     text: 'Books, films, stories and tools I have found helpful or just really loved.',
     icon: Bookmark,
@@ -300,11 +299,6 @@ export default function About() {
             ))}
           </div>
         </div>
-      </section>
-
-      {/* ---------- Newsletter ---------- */}
-      <section className={`${container} py-16`}>
-        <CheckerCta wide />
       </section>
     </div>
   )

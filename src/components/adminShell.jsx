@@ -8,7 +8,6 @@ import Seo from '@/components/seo'
 
 const NAV = [
   { to: '/admin', label: 'Posts', match: (p) => p === '/admin' || p.startsWith('/admin/posts') },
-  { to: '/admin/recommendations', label: 'Recommendations', match: (p) => p.startsWith('/admin/recommendations') },
   { to: '/admin/categories', label: 'Categories', match: (p) => p.startsWith('/admin/categories') },
   { to: '/admin/subscribers', label: 'Subscribers', match: (p) => p.startsWith('/admin/subscribers') },
 ]

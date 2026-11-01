@@ -1,7 +1,8 @@
 import { supabase } from '../lib/supabase';
 import { slugify } from '../utils/slugify';
 
-// Post categories (Reviews, Story Development, ...)
+// Post categories. Reviews, Off the Page, Recommendations and everything else
+// are all just categories on posts.
 export class CategoryService {
   /** All post categories, A to Z. */
   static async list() {
@@ -9,6 +10,18 @@ export class CategoryService {
       .from('categories')
       .select('*')
       .order('name', { ascending: true });
+
+    if (error) throw error;
+    return data;
+  }
+
+  /** One category by its slug, or null if it does not exist. */
+  static async getBySlug(slug) {
+    const { data, error } = await supabase
+      .from('categories')
+      .select('*')
+      .eq('slug', slug)
+      .maybeSingle();
 
     if (error) throw error;
     return data;

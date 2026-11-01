@@ -7,8 +7,6 @@ import { Button } from '@/components/ui/button'
 import SectionHeading from '@/components/sectionHeading'
 import { formatDate } from '@/components/articleCard'
 import CategoryPill from '@/components/categoryPill'
-import { NAV_ONLY_SLUGS } from '@/lib/siteConfig'
-import CheckerCta from '@/components/checkerCta'
 import Seo from '@/components/seo'
 
 const EXPLORE_STYLES = [
@@ -98,7 +96,7 @@ export default function Home() {
     async function load() {
       try {
         const [list, cats] = await Promise.all([
-          PostService.list({ page: 1, pageSize: 6, excludeCategorySlugs: NAV_ONLY_SLUGS }),
+          PostService.list({ page: 1, pageSize: 6 }),
           CategoryService.list(),
         ])
         setPosts(list.posts)
@@ -113,7 +111,7 @@ export default function Home() {
     load()
   }, [])
 
-  const exploreCategories = categories.filter((c) => !NAV_ONLY_SLUGS.includes(c.slug)).slice(0, 3)
+  const exploreCategories = categories.slice(0, 3)
 
   return (
     <div>
@@ -272,10 +270,6 @@ export default function Home() {
                 ))}
               </div>
             )}
-          </section>
-
-          <section className={`${container} pb-14`}>
-            <CheckerCta wide />
           </section>
 
           {/* ---------- 5. Explore the blog ---------- */}

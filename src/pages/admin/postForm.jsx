@@ -22,6 +22,16 @@ const EMPTY_FORM = {
   exercise: '',
   resources: [],
   status: 'draft',
+  pinned: false,
+  published_at: '', // local date and time for the date picker; empty = publish now
+}
+
+// The date picker wants "YYYY-MM-DDTHH:mm" in the browser's own time zone.
+function toLocalInput(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  const pad = (n) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
 }
 
 // Same look as the shadcn Input, for selects and text areas
@@ -118,6 +128,8 @@ export default function PostForm() {
             exercise: post.exercise ?? '',
             resources: post.resources ?? [],
             status: post.status ?? 'draft',
+            pinned: post.pinned ?? false,
+            published_at: toLocalInput(post.published_at),
           })
           setSlugTouched(true) // do not change the slug of an existing post by accident
         }
@@ -247,6 +259,13 @@ export default function PostForm() {
         .map((r) => ({ title: r.title.trim(), url: r.url.trim() }))
         .filter((r) => r.title && r.url),
       status: form.status,
+      // archived posts are never pinned
+      pinned: form.status === 'archived' ? false : form.pinned,
+    }
+
+    // Only a published post uses the date. Empty = publish now, a future date = scheduled.
+    if (form.status === 'published') {
+      payload.published_at = form.published_at ? new Date(form.published_at).toISOString() : null
     }
 
     try {
@@ -272,6 +291,9 @@ export default function PostForm() {
   const wordCount = form.content.trim() ? form.content.trim().split(/\s+/).length : 0
 
   const saveLabel = saving ? 'Saving...' : isEditing ? 'Save changes' : 'Create post'
+
+  const isScheduled =
+    form.status === 'published' && form.published_at && new Date(form.published_at) > new Date()
 
   const shellProps = {
     title: isEditing ? 'Edit post' : 'New post',
@@ -528,9 +550,27 @@ export default function PostForm() {
                   className={selectClass}
                 >
                   <option value="draft">Draft (hidden)</option>
-                  <option value="published">Published (visible)</option>
+                  <option value="published">Published (visible, or scheduled)</option>
+                  <option value="archived">Archived (hidden, kept for you)</option>
                 </select>
               </Field>
+
+              {form.status === 'published' && (
+                <Field label="Publish date" hint="(optional)" htmlFor="published_at">
+                  <input
+                    id="published_at"
+                    type="datetime-local"
+                    value={form.published_at}
+                    onChange={(e) => setField('published_at', e.target.value)}
+                    className={selectClass}
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    {isScheduled
+                      ? 'Scheduled: it goes live on this date and time.'
+                      : 'Leave empty to publish now. Pick a future date to schedule it.'}
+                  </p>
+                </Field>
+              )}
 
               <Field label="Category" htmlFor="category">
                 <select
@@ -547,6 +587,18 @@ export default function PostForm() {
                   ))}
                 </select>
               </Field>
+
+              {form.status !== 'archived' && (
+                <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
+                  <input
+                    type="checkbox"
+                    checked={form.pinned}
+                    onChange={(e) => setField('pinned', e.target.checked)}
+                    className="size-4 accent-primary"
+                  />
+                  Pin to the top of the list
+                </label>
+              )}
 
               <Button type="submit" disabled={saving || uploading} className="w-full">
                 {saveLabel}

@@ -3,10 +3,8 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import { PostService } from '@/service/postService'
 import { CategoryService } from '@/service/categoryService'
-import { NAV_ONLY_SLUGS } from '@/lib/siteConfig'
 import { Input } from '@/components/ui/input'
 import ArticleCard from '@/components/articleCard'
-import CheckerCta from '@/components/checkerCta'
 import AuthorCard from '@/components/authorCard'
 import { categoryTone } from '@/components/categoryPill'
 import Seo from '@/components/seo'
@@ -51,8 +49,6 @@ export default function Articles() {
       page,
       pageSize: PAGE_SIZE,
       categorySlug: slug,
-      // On the main list, Reviews and Off the Page are hidden. Their own pages still show them.
-      excludeCategorySlugs: slug ? [] : NAV_ONLY_SLUGS,
       search: q,
       sort,
     })
@@ -75,8 +71,6 @@ export default function Articles() {
   // Keep the search box in step with the address bar
   useEffect(() => setSearchInput(q), [q])
 
-  const isNavOnlyPage = Boolean(slug) && NAV_ONLY_SLUGS.includes(slug)
-  const filterCategories = categories.filter((c) => !NAV_ONLY_SLUGS.includes(c.slug))
   const currentCategory = categories.find((c) => c.slug === slug)
   const unknownCategory = slug && categories.length > 0 && !currentCategory
   const title = slug ? currentCategory?.name ?? '' : 'All articles'
@@ -111,7 +105,7 @@ export default function Articles() {
     chip: 'bg-card border-border hover:border-foreground/40',
     active: 'bg-foreground border-foreground text-background',
   }
-  const totalCount = filterCategories.reduce((sum, c) => sum + (counts[c.id] ?? 0), 0)
+  const totalCount = categories.reduce((sum, c) => sum + (counts[c.id] ?? 0), 0)
 
   const first = result.total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1
   const last = Math.min(page * PAGE_SIZE, result.total)
@@ -150,14 +144,13 @@ export default function Articles() {
       <div className={`${container} grid gap-10 pb-12 pt-8 lg:grid-cols-[minmax(0,1fr)_320px] xl:gap-12`}>
         {/* ---------- Main column ---------- */}
         <div className="min-w-0">
-          {/* Category chips (not shown on the Reviews and Off the Page pages) */}
-          {!isNavOnlyPage && (
-            <div className="flex flex-wrap gap-3">
+          {/* Category chips */}
+          <div className="flex flex-wrap gap-3">
               <Link to="/articles" className={chipClass(!slug, allTone)}>
                 All
                 <span className={countClass(!slug)}>{totalCount}</span>
               </Link>
-              {filterCategories.map((c) => {
+              {categories.map((c) => {
                 const active = c.slug === slug
                 return (
                   <Link key={c.id} to={`/category/${c.slug}`} className={chipClass(active, categoryTone(c.slug))}>
@@ -166,11 +159,10 @@ export default function Articles() {
                   </Link>
                 )
               })}
-            </div>
-          )}
+          </div>
 
           {/* Count + sort */}
-          <div className={cn('flex flex-wrap items-center justify-between gap-3 text-sm', !isNavOnlyPage && 'mt-6')}>
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="text-muted-foreground">
               {result.total > 0 ? `Showing ${first}-${last} of ${result.total} articles` : ''}
               {q && <span> for "{q}"</span>}
@@ -234,11 +226,6 @@ export default function Articles() {
           <AuthorCard />
         </aside>
       </div>
-
-      {/* ---------- Newsletter, full width at the bottom ---------- */}
-      <section className={`${container} pb-16`}>
-        <CheckerCta wide />
-      </section>
     </div>
   )
 }

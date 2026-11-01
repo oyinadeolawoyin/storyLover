@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
 // A small reusable box to add, rename and delete categories.
-// It works with any service that has list, create, update and delete.
+// It works with any service that has list, create, update and delete
+// (right now that is just CategoryService).
 export default function CategoryManager({ title, service }) {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
@@ -66,7 +67,7 @@ export default function CategoryManager({ title, service }) {
 
   async function handleDelete(item) {
     const sure = window.confirm(
-      `Delete the category "${item.name}"? Items in it will not be deleted, they will just have no category.`
+      `Delete the category "${item.name}"? Posts in it will not be deleted, they will just have no category.`
     )
     if (!sure) return
 

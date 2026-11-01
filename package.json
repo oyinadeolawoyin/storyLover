@@ -1,5 +1,6 @@
 {
-  "name": "author-demo-site",
+  "name": "StoryLover",
+  "description": "Learn storytelling, understand your story, and write a first draft that works.",
   "private": true,
   "version": "0.0.0",
   "type": "module",

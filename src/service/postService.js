@@ -2,9 +2,19 @@ import { supabase } from '../lib/supabase';
 
 const PAGE_SIZE = 10;
 
+/**
+ * "Live" = published, archived posts excluded, and the publish date has arrived.
+ * A published post with a FUTURE date is scheduled, so visitors do not see it yet.
+ * Every public query goes through this, because you are the admin and the database
+ * would otherwise show you drafts, archived and scheduled posts on the live site too.
+ */
+function live(query) {
+  return query.eq('status', 'published').lte('published_at', new Date().toISOString());
+}
+
 export class PostService {
   /**
-   * List published posts.
+   * List live posts. Pinned posts come first when sorting by newest.
    * Options: { page = 1, pageSize = 10, categorySlug, excludeCategorySlugs = [], search, sort = 'newest' | 'oldest' }
    * Returns { posts, total, page, pageSize, totalPages }
    */
@@ -31,13 +41,17 @@ export class PostService {
     // otherwise posts without a match would still be returned.
     const categorySelect = categorySlug ? 'category:categories!inner(*)' : 'category:categories(*)';
 
-    let query = supabase
-      .from('posts')
-      .select(`id, title, slug, excerpt, cover_image, read_minutes, published_at, ${categorySelect}`, {
-        count: 'exact',
-      })
-      .eq('status', 'published')
-      .order('published_at', { ascending: sort === 'oldest' });
+    let query = live(
+      supabase
+        .from('posts')
+        .select(`id, title, slug, excerpt, cover_image, read_minutes, published_at, pinned, ${categorySelect}`, {
+          count: 'exact',
+        })
+    );
+
+    // Pinned posts first, then by date
+    if (sort !== 'oldest') query = query.order('pinned', { ascending: false });
+    query = query.order('published_at', { ascending: sort === 'oldest' });
 
     if (categorySlug) query = query.eq('category.slug', categorySlug);
 
@@ -65,12 +79,9 @@ export class PostService {
     };
   }
 
-  /** How many published posts each category has. Returns { [category_id]: number } */
+  /** How many live posts each category has. Returns { [category_id]: number } */
   static async countsByCategory() {
-    const { data, error } = await supabase
-      .from('posts')
-      .select('category_id')
-      .eq('status', 'published');
+    const { data, error } = await live(supabase.from('posts').select('category_id'));
 
     if (error) throw error;
 
@@ -81,29 +92,27 @@ export class PostService {
     return counts;
   }
 
-  /** Get one published post by slug, with its category. */
+  /** Get one live post by slug, with its category. */
   static async getBySlug(slug) {
-    const { data, error } = await supabase
-      .from('posts')
-      .select('*, category:categories(*)')
-      .eq('slug', slug)
-      .eq('status', 'published')
-      .single();
+    const { data, error } = await live(
+      supabase.from('posts').select('*, category:categories(*)').eq('slug', slug)
+    ).single();
 
     if (error) throw error;
     return data;
   }
 
-  /** Other published posts from the same category (and only that category). */
+  /** Other live posts from the same category (and only that category). */
   static async related({ categoryId, excludeId, limit = 3 }) {
     if (!categoryId) return [];
 
-    const { data, error } = await supabase
-      .from('posts')
-      .select('id, title, slug, cover_image, read_minutes, published_at, category:categories(*)')
-      .eq('status', 'published')
-      .eq('category_id', categoryId)
-      .neq('id', excludeId)
+    const { data, error } = await live(
+      supabase
+        .from('posts')
+        .select('id, title, slug, cover_image, read_minutes, published_at, category:categories(*)')
+        .eq('category_id', categoryId)
+        .neq('id', excludeId)
+    )
       .order('published_at', { ascending: false })
       .limit(limit);
 
@@ -112,14 +121,15 @@ export class PostService {
   }
 
   /**
-   * A mix of other published posts from different categories (Reviews and Off the Page included).
+   * A mix of other live posts from different categories.
    * One post per category first, other categories before the current one, then fills up.
    */
   static async mixed({ excludeIds = [], categoryId, limit = 3 }) {
-    let query = supabase
-      .from('posts')
-      .select('id, title, slug, excerpt, cover_image, read_minutes, published_at, category_id, category:categories(*)')
-      .eq('status', 'published')
+    let query = live(
+      supabase
+        .from('posts')
+        .select('id, title, slug, excerpt, cover_image, read_minutes, published_at, category_id, category:categories(*)')
+    )
       .order('published_at', { ascending: false })
       .limit(30);
 
@@ -147,14 +157,15 @@ export class PostService {
     return [...otherCategories, ...sameCategory, ...rest].slice(0, limit);
   }
 
-  /** The next older post in the same category, or null. */
+  /** The next older live post in the same category, or null. */
   static async next({ categoryId, publishedAt, excludeId }) {
-    let query = supabase
-      .from('posts')
-      .select('id, title, slug, cover_image, read_minutes, published_at, category:categories(*)')
-      .eq('status', 'published')
-      .neq('id', excludeId)
-      .lt('published_at', publishedAt)
+    let query = live(
+      supabase
+        .from('posts')
+        .select('id, title, slug, cover_image, read_minutes, published_at, category:categories(*)')
+        .neq('id', excludeId)
+        .lt('published_at', publishedAt)
+    )
       .order('published_at', { ascending: false })
       .limit(1);
 
@@ -171,11 +182,13 @@ export class PostService {
   // The database policies block them for everyone else.
   // ============================================================
 
-  /** List ALL posts (drafts included), newest first. For the admin list. */
+  /** List ALL posts (drafts, scheduled and archived included), newest first. For the admin list. */
   static async listAll() {
     const { data, error } = await supabase
       .from('posts')
-      .select('id, title, slug, status, published_at, created_at, category_id, category:categories(id, name)')
+      .select(
+        'id, title, slug, status, pinned, published_at, created_at, category_id, category:categories(id, name)'
+      )
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -194,7 +207,10 @@ export class PostService {
     return data;
   }
 
-  /** Create a new post. Pass an object like { title, slug, content, category_id, ... } */
+  /**
+   * Create a new post. Pass an object like { title, slug, content, category_id, ... }
+   * To schedule: status 'published' with a future published_at (ISO string).
+   */
   static async create(post) {
     const { data, error } = await supabase
       .from('posts')
@@ -219,9 +235,17 @@ export class PostService {
     return data;
   }
 
-  /** Publish or unpublish: status is 'published' or 'draft'. */
-  static async setStatus(id, status) {
-    return PostService.update(id, { status });
+  /**
+   * Change the status: 'draft', 'published' or 'archived'.
+   * `extra` can carry more fields, e.g. { published_at: new Date().toISOString() } to publish now.
+   */
+  static async setStatus(id, status, extra = {}) {
+    return PostService.update(id, { status, ...extra });
+  }
+
+  /** Pin or unpin a post (pinned posts show first). */
+  static async setPinned(id, pinned) {
+    return PostService.update(id, { pinned });
   }
 
   /** Delete a post for good. */
