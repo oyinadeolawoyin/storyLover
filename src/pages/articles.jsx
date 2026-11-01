@@ -8,6 +8,7 @@ import ArticleCard from '@/components/articleCard'
 import AuthorCard from '@/components/authorCard'
 import { categoryTone } from '@/components/categoryPill'
 import Seo from '@/components/seo'
+import { ArticleCardSkeleton } from '@/components/skeletons'
 import SubscribeForm from '@/components/subscribeForm'
 import { cn } from '@/lib/utils'
 
@@ -157,10 +158,16 @@ export default function Articles() {
 
           {!error && !unknownCategory && (
             <>
-              <div className={cn('mt-4 grid gap-6 transition-opacity sm:grid-cols-2', loading && 'opacity-50')}>
-                {result.posts.map((p) => (
-                  <ArticleCard key={p.id} post={p} />
-                ))}
+              <div
+                className={cn(
+                  'mt-4 grid gap-6 transition-opacity sm:grid-cols-2',
+                  loading && result.posts.length > 0 && 'opacity-50'
+                )}
+                aria-busy={loading}
+              >
+                {loading && result.posts.length === 0
+                  ? Array.from({ length: PAGE_SIZE }).map((_, i) => <ArticleCardSkeleton key={i} />)
+                  : result.posts.map((p) => <ArticleCard key={p.id} post={p} />)}
               </div>
 
               {!loading && result.posts.length === 0 && (

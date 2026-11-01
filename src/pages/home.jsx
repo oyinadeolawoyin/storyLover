@@ -9,6 +9,7 @@ import { formatDate } from '@/components/articleCard'
 import CategoryPill from '@/components/categoryPill'
 import Seo from '@/components/seo'
 import Reveal from '@/components/reveal'
+import { TeaserSkeleton } from '@/components/skeletons'
 import SubscribeForm from '@/components/subscribeForm'
 
 const EXPLORE_STYLES = [
@@ -181,7 +182,16 @@ export default function Home() {
         </div>
       </section>
 
-      {loading && <p className={`${container} py-16 text-muted-foreground`}>Loading...</p>}
+      {loading && (
+        <section className={`${container} py-14`} aria-busy="true">
+          <SectionHeading title="Latest articles" to="/articles" linkLabel="See all articles" />
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <TeaserSkeleton key={i} />
+            ))}
+          </div>
+        </section>
+      )}
       {error && (
         <p className={`${container} py-16 text-destructive`}>
           Posts could not load. Check the console for details.

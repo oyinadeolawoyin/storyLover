@@ -17,6 +17,7 @@ import AuthorCard from '@/components/authorCard'
 import ArticleCard, { formatDate } from '@/components/articleCard'
 import SectionHeading from '@/components/sectionHeading'
 import Seo from '@/components/seo'
+import { PostSkeleton } from '@/components/skeletons'
 import SubscribeForm from '@/components/subscribeForm'
 import { useReadTracking } from '@/hooks/useReadTracking'
 import { AnalyticsService } from '@/service/analyticsService'
@@ -111,7 +112,7 @@ export default function Post() {
     readMinutes: post?.read_minutes,
   })
 
-  if (loading && !post) return <p className={`${container} py-16 text-muted-foreground`}>Loading...</p>
+  if (loading && !post) return <PostSkeleton />
 
   if (error || !post) {
     return (

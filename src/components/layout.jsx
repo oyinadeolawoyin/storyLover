@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom'
 import { Menu } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
+import { InstagramIcon, TumblrIcon, XIcon } from '@/components/brandIcons'
 import {
   Sheet,
   SheetClose,
@@ -26,6 +27,12 @@ const mobileLinkClass = (active) =>
     'rounded-lg px-3 py-2 text-base font-semibold',
     active ? 'bg-accent text-accent-foreground' : 'text-foreground/80'
   )
+
+const SOCIALS = [
+  { label: 'X', href: 'https://x.com/Tolageek', icon: XIcon },
+  { label: 'Instagram', href: 'https://www.instagram.com/oyinade_storylover/', icon: InstagramIcon },
+  { label: 'Tumblr', href: 'https://www.tumblr.com/oyinade-storylover', icon: TumblrIcon },
+]
 
 function Logo({ className }) {
   return (
@@ -106,22 +113,56 @@ export default function Layout() {
         <Outlet />
       </main>
 
-      <footer className="border-t border-border bg-secondary/70">
-        <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-10 sm:px-6 md:flex-row md:items-center md:justify-between">
+      <footer className="border-t border-border bg-background">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
-            <Logo className="text-xl" />
-            <p className="hand mt-1 text-lg leading-none text-sky">Create a story that moves your readers.</p>
+            <Logo className="text-2xl" />
+            <p className="hand mt-2 text-xl leading-none text-sky">Create a story that moves your readers.</p>
           </div>
 
-          <nav className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-foreground/75">
-            {links.map((l) => (
-              <Link key={l.to} to={l.to} className="hover:text-primary">
-                {l.label}
-              </Link>
-            ))}
+          <nav aria-label="Footer">
+            <h2 className="font-sans text-xs font-bold uppercase tracking-[0.18em] text-foreground/60">Explore</h2>
+            <ul className="mt-4 space-y-2 text-sm">
+              {links.map((l) => (
+                <li key={l.to}>
+                  <Link to={l.to} className="text-foreground/75 hover:text-primary">
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </nav>
 
-          <p className="text-xs text-muted-foreground">&copy; {new Date().getFullYear()} StoryLover</p>
+          <div>
+            <h2 className="font-sans text-xs font-bold uppercase tracking-[0.18em] text-foreground/60">Connect</h2>
+            <div className="mt-4 flex items-center gap-4">
+              {SOCIALS.map(({ label, href, icon: Icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  className="text-foreground/60 transition-colors hover:text-primary"
+                >
+                  <Icon className="size-5" />
+                </a>
+              ))}
+            </div>
+            <a
+              href="mailto:oyinadeolawoyin72@gmail.com"
+              className="mt-4 inline-block break-all text-sm text-foreground/75 hover:text-primary"
+            >
+              oyinadeolawoyin72@gmail.com
+            </a>
+          </div>
+        </div>
+
+        <div className="border-t border-border">
+          <div className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <p>&copy; {new Date().getFullYear()} StoryLover</p>
+            <p>#StoryLoversCommunity</p>
+          </div>
         </div>
       </footer>
     </div>
