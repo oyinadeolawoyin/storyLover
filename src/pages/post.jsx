@@ -13,7 +13,6 @@ import {
   TumblrIcon,
   XIcon,
 } from '@/components/brandIcons'
-import CheckerCta from '@/components/checkerCta'
 import AuthorCard from '@/components/authorCard'
 import ArticleCard, { formatDate } from '@/components/articleCard'
 import SectionHeading from '@/components/sectionHeading'
@@ -269,10 +268,39 @@ export default function Post() {
 
       {/* ---------- End of the article ---------- */}
       <section className={`${container} pb-16`}>
-        <p className="hand mb-8 text-center text-3xl text-foreground/80">
-          You made it to the end. Thank you for reading.
-        </p>
-        <CheckerCta wide />
+        <div className="mb-8 text-center">
+          <p className="hand text-3xl text-foreground/80">You made it to the end. Thank you for reading!</p>
+          <p className="mt-3 text-sm text-foreground/70">
+            Have thoughts or questions about this post? Come talk to me on{' '}
+            <a
+              href="https://x.com/Tolageek"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-sky underline-offset-4 hover:underline"
+            >
+              X
+            </a>
+            ,{' '}
+            <a
+              href="https://www.instagram.com/oyinade_storylover/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-sky underline-offset-4 hover:underline"
+            >
+              Instagram
+            </a>
+            , or{' '}
+            <a
+              href="https://www.tumblr.com/oyinade-storylover"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-sky underline-offset-4 hover:underline"
+            >
+              Tumblr
+            </a>
+            {' '}— I’d love to hear from you.
+          </p>
+        </div>
       </section>
 
       {/* ---------- More to read: a mix of categories ---------- */}
