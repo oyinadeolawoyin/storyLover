@@ -8,6 +8,7 @@ import SectionHeading from '@/components/sectionHeading'
 import { formatDate } from '@/components/articleCard'
 import CategoryPill from '@/components/categoryPill'
 import Seo from '@/components/seo'
+import ErrorMessage from '@/components/errorMessage'
 import Reveal from '@/components/reveal'
 import { TeaserSkeleton } from '@/components/skeletons'
 import SubscribeForm from '@/components/subscribeForm'
@@ -193,9 +194,11 @@ export default function Home() {
         </section>
       )}
       {error && (
-        <p className={`${container} py-16 text-destructive`}>
-          Posts could not load. Check the console for details.
-        </p>
+        <ErrorMessage
+          className={container}
+          title="We couldn't load the latest articles"
+          message="Please check your connection and try again."
+        />
       )}
 
       {!loading && !error && (

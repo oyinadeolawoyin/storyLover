@@ -8,6 +8,7 @@ import ArticleCard from '@/components/articleCard'
 import AuthorCard from '@/components/authorCard'
 import { categoryTone } from '@/components/categoryPill'
 import Seo from '@/components/seo'
+import ErrorMessage from '@/components/errorMessage'
 import { ArticleCardSkeleton } from '@/components/skeletons'
 import SubscribeForm from '@/components/subscribeForm'
 import { cn } from '@/lib/utils'
@@ -196,7 +197,12 @@ export default function Articles() {
           </div>
 
           {/* Posts */}
-          {error && <p className="mt-8 text-destructive">Articles could not load. Check the console.</p>}
+          {error && (
+            <ErrorMessage
+              title="We couldn't load the articles"
+              message="Please check your connection and try again."
+            />
+          )}
           {unknownCategory && <p className="mt-8 text-muted-foreground">That category does not exist.</p>}
 
           {!error && !unknownCategory && (

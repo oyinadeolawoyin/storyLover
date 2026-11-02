@@ -17,6 +17,7 @@ import AuthorCard from '@/components/authorCard'
 import ArticleCard, { formatDate } from '@/components/articleCard'
 import SectionHeading from '@/components/sectionHeading'
 import Seo from '@/components/seo'
+import ErrorMessage from '@/components/errorMessage'
 import { PostSkeleton } from '@/components/skeletons'
 import SubscribeForm from '@/components/subscribeForm'
 import { useReadTracking } from '@/hooks/useReadTracking'
@@ -115,14 +116,26 @@ export default function Post() {
   if (loading && !post) return <PostSkeleton />
 
   if (error || !post) {
-    return (
-      <div className={`${container} py-16`}>
-        <h1 className="text-3xl font-bold">Post not found</h1>
-        <p className="mt-3 text-muted-foreground">It may have moved or been unpublished.</p>
-        <Link to="/articles" className="mt-6 inline-block font-semibold text-sky hover:underline">
-          Back to all articles
-        </Link>
-      </div>
+    // Supabase returns code PGRST116 when .single() finds no row, meaning the post really isn't there.
+    // Anything else (network trouble, server error) is a loading problem, not a missing post.
+    const notFound = !error || error.code === 'PGRST116'
+    return notFound ? (
+      <ErrorMessage
+        variant="page"
+        title="Post not found"
+        message="It may have moved or been unpublished."
+        onRetry={false}
+        linkTo="/articles"
+        linkLabel="Back to all articles"
+      />
+    ) : (
+      <ErrorMessage
+        variant="page"
+        title="We couldn't load this post"
+        message="Something went wrong on our end. Please check your connection and try again."
+        linkTo="/articles"
+        linkLabel="Back to all articles"
+      />
     )
   }
 
