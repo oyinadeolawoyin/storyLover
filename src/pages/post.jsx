@@ -238,7 +238,10 @@ export default function Post() {
         </div>
 
         <aside className="min-w-0 space-y-6">
-          <ShareCard title={post.title} excerpt={post.excerpt} image={post.cover_image} slug={post.slug} />
+          {/* On phones the share box at the end of the article is enough, so this one is desktop only */}
+          <div className="hidden lg:block">
+            <ShareCard title={post.title} excerpt={post.excerpt} image={post.cover_image} slug={post.slug} />
+          </div>
 
           {related.length > 0 && (
             <div className="card-soft p-6">

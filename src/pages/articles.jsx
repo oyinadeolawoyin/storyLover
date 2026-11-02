@@ -102,6 +102,26 @@ export default function Articles() {
     chip: 'bg-card border-border hover:border-foreground/40',
     active: 'bg-foreground border-foreground text-background',
   }
+  // Category chips for small screens: one horizontal row you can swipe
+  const chipClass = (active, tone) =>
+    cn(
+      'flex shrink-0 items-center gap-2 whitespace-nowrap rounded-md border px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] transition-colors',
+      active ? tone.active : cn(tone.chip, 'text-foreground/85')
+    )
+
+  const searchBox = (
+    <form onSubmit={handleSearch} className="relative">
+      <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+      <Input
+        value={searchInput}
+        onChange={(e) => setSearchInput(e.target.value)}
+        placeholder="Search articles"
+        aria-label="Search articles"
+        className="h-11 rounded-full bg-card pl-10"
+      />
+    </form>
+  )
+
   const totalCount = categories.reduce((sum, c) => sum + (counts[c.id] ?? 0), 0)
 
   const first = result.total === 0 ? 0 : (page - 1) * PAGE_SIZE + 1
@@ -133,6 +153,29 @@ export default function Articles() {
       <div className={`${container} grid gap-10 pb-12 pt-8 lg:grid-cols-[minmax(0,1fr)_320px] xl:gap-12`}>
         {/* ---------- Main column ---------- */}
         <div className="min-w-0">
+          {/* Small screens: search and categories sit above the posts */}
+          <div className="space-y-4 lg:hidden">
+            {searchBox}
+            <nav
+              aria-label="Categories"
+              className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:-mx-6 sm:px-6 [&::-webkit-scrollbar]:hidden"
+            >
+              <Link to="/articles" className={chipClass(!slug, allTone)}>
+                All
+                <span className={countClass(!slug)}>{totalCount}</span>
+              </Link>
+              {categories.map((c) => {
+                const active = c.slug === slug
+                return (
+                  <Link key={c.id} to={`/category/${c.slug}`} className={chipClass(active, categoryTone(c.slug))}>
+                    {c.name}
+                    <span className={countClass(active)}>{counts[c.id] ?? 0}</span>
+                  </Link>
+                )
+              })}
+            </nav>
+          </div>
+
           {/* Count + sort */}
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3 text-sm">
             <p className="text-muted-foreground">
@@ -190,19 +233,10 @@ export default function Articles() {
 
         {/* ---------- Sidebar: stays in view while you scroll ---------- */}
         <aside className="min-w-0 space-y-6 lg:sticky lg:top-24 lg:self-start">
-          <form onSubmit={handleSearch} className="relative">
-            <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Search articles"
-              aria-label="Search articles"
-              className="h-11 rounded-full bg-card pl-10"
-            />
-          </form>
+          <div className="hidden lg:block">{searchBox}</div>
 
           {/* Categories */}
-          <div className="rounded-xl border border-border bg-card p-5 shadow-soft">
+          <div className="hidden rounded-xl border border-border bg-card p-5 shadow-soft lg:block">
             <h2 className="hand text-3xl leading-none">Categories</h2>
             <ul className="mt-4 space-y-2">
               <li>
