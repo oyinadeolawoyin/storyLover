@@ -10,10 +10,12 @@ import { cn } from '@/lib/utils'
 //  - wide: a full-width band, text on the left and the form on the right (bottom of a page)
 // tone: 'rose' (default) or 'butter'
 export default function SubscribeForm({ tone = 'rose', wide = false, className }) {
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [trap, setTrap] = useState('') // hidden field: only bots fill it in
   const [state, setState] = useState('idle') // 'idle' | 'sending' | 'done'
   const [message, setMessage] = useState('')
+  const [welcomeName, setWelcomeName] = useState('')
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -27,10 +29,11 @@ export default function SubscribeForm({ tone = 'rose', wide = false, className }
 
     try {
       setState('sending')
-      await SubscriberService.subscribe(email)
+      await SubscriberService.subscribe(email, name)
+      setWelcomeName(name.trim())
       setState('done')
-      setMessage('Thank you for subscribing!')
       setEmail('')
+      setName('')
     } catch (err) {
       console.error(err)
       setState('idle')
@@ -44,6 +47,8 @@ export default function SubscribeForm({ tone = 'rose', wide = false, className }
       }
     }
   }
+
+  const idSuffix = wide ? '-wide' : ''
 
   return (
     <div
@@ -63,19 +68,38 @@ export default function SubscribeForm({ tone = 'rose', wide = false, className }
             <h3 className={cn('hand leading-none', wide ? 'text-4xl' : 'text-3xl')}>Stay in the story</h3>
           </div>
           <p className="mt-3 text-sm leading-relaxed text-foreground/75">
-            New articles and writing tips, straight to your inbox.
+            New articles and writing tips, straight to your inbox. Pop your first
+            name in too, and I'll say hello properly.
           </p>
         </div>
 
         {state === 'done' ? (
-          <p className={cn('text-sm font-semibold text-emerald-700', !wide && 'mt-5')}>
-            {message || 'Thank you for subscribing!'}
-          </p>
+          <div role="status" className={cn('space-y-1', !wide && 'mt-5')}>
+            <p className="text-sm font-semibold text-emerald-700">
+              Thank you{welcomeName ? `, ${welcomeName}` : ''}! 🌱
+            </p>
+            <p className="text-sm leading-relaxed text-foreground/75">
+              Please check your inbox for a welcome email from us. If it isn't
+              there within a few minutes, have a look in your spam or promotions
+              folder.
+            </p>
+          </div>
         ) : (
           <form onSubmit={handleSubmit} className={cn(!wide && 'mt-5')}>
             <div className={cn(wide ? 'flex flex-col gap-3 sm:flex-row' : 'space-y-3')}>
               <Input
-                id={wide ? 'subscribe-email-wide' : 'subscribe-email'}
+                id={`subscribe-name${idSuffix}`}
+                type="text"
+                placeholder="First name (optional)"
+                aria-label="First name (optional)"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                maxLength={60}
+                autoComplete="given-name"
+                className={cn('h-11 rounded-full border-border bg-white px-4', wide && 'flex-1')}
+              />
+              <Input
+                id={`subscribe-email${idSuffix}`}
                 type="email"
                 placeholder="Your email address"
                 aria-label="Email address"
