@@ -128,7 +128,7 @@ const config = {
   
     // 6) CREDIT (always show your source)
     credit: {
-      text: "Idea adapted from Jeff Lyons’s story vs. situation distinction. This tool is my own interpretation, not his official test.",
+      text: "Idea adapted from Jeff Lyons’s story vs. situation distinction.",
       url: "https://writers.com/stories-vs-situations-how-to-know-your-story-will-work-in-any-genre",
       linkLabel: "Read his article.",
     },
