@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { BookOpen, Brain, Lightbulb, LayoutGrid, Sparkles } from 'lucide-react'
+import { ArrowRight, BookOpen, Brain, Lightbulb, LayoutGrid, Sparkles } from 'lucide-react'
 import { PostService } from '@/service/postService'
 import { CategoryService } from '@/service/categoryService'
 import { Button } from '@/components/ui/button'
@@ -203,7 +203,7 @@ export default function Home() {
 
       {!loading && !error && (
         <>
-          {/* ---------- 4. Latest articles, then the newsletter underneath ---------- */}
+          {/* ---------- 4. Latest articles ---------- */}
           <section className={`${container} py-14`}>
             <SectionHeading title="Latest articles" to="/articles" linkLabel="See all articles" />
 
@@ -238,7 +238,26 @@ export default function Home() {
             )}
           </section>
 
-          {/* ---------- 5. Explore the blog ---------- */}
+          {/* ---------- 5. Quick win: the quizzes ---------- */}
+          <section className={`${container} pb-14`}>
+            <Reveal className="rounded-2xl border border-border bg-rose-soft px-6 py-10 text-center sm:px-10 md:py-12">
+              <p className="hand text-2xl text-sky">A quick win</p>
+              <h2 className="mt-2 text-3xl font-bold leading-tight md:text-4xl">
+                Learn something new about your story
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-foreground/80">
+                Check out my quizzes to help you uncover more about your story and your unique writing strengths.
+              </p>
+              <Button asChild size="lg" className="mt-7 rounded-full px-7">
+                <Link to="/tools">
+                  Take a quiz
+                  <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+            </Reveal>
+          </section>
+
+          {/* ---------- 6. Explore the blog ---------- */}
           {exploreCategories.length > 0 && (
             <section className="bg-sky-soft/50 py-12">
               <div className={container}>
@@ -276,7 +295,7 @@ export default function Home() {
             </section>
           )}
 
-          {/* ---------- 6. About strip ---------- */}
+          {/* ---------- 7. About strip ---------- */}
           <section className="bg-butter-soft/70">
             <div className={`${container} flex flex-col items-center gap-6 py-10 sm:flex-row`}>
               {/* Put your photo at public/oyin.jpg */}
@@ -306,7 +325,7 @@ export default function Home() {
         </>
       )}
 
-      {/* ---------- 7. Newsletter ---------- */}
+      {/* ---------- 8. Newsletter ---------- */}
       <section className={`${container} py-14`}>
         <SubscribeForm wide />
       </section>

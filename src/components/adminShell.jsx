@@ -10,6 +10,7 @@ const NAV = [
   { to: '/admin', label: 'Posts', match: (p) => p === '/admin' || p.startsWith('/admin/posts') },
   { to: '/admin/categories', label: 'Categories', match: (p) => p.startsWith('/admin/categories') },
   { to: '/admin/subscribers', label: 'Subscribers', match: (p) => p.startsWith('/admin/subscribers') },
+  {to: '/admin/newsletters',  label: 'Emails', match: (p) => p.startsWith('/admin/newsletters') }
 ]
 
 /**

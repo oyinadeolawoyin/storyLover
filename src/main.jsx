@@ -8,12 +8,15 @@ import About from './pages/about'
 import Articles from './pages/articles'
 import Post from './pages/post'
 import NotFound from './pages/notFound'
+import Tools from './pages/tools'
+import Tool from './pages/tool'
 import Login from './pages/admin/login'
 import Admin from './pages/admin/admin'
 import PostForm from './pages/admin/postForm'
 import AdminCategories from './pages/admin/adminCategories'
 import AdminSubscribers from './pages/admin/adminSubscribers'
 import AdminRoute from './components/adminRoutes'
+import AdminNewsletter from './pages/admin/adminNewsletters'
 
 const router = createBrowserRouter([
   // Public site: every page here gets the header and footer
@@ -28,6 +31,8 @@ const router = createBrowserRouter([
       { path: '/recommendations', element: <Navigate to="/category/recommendations" replace /> },
       { path: '/posts/:slug', element: <Post /> },
       { path: '/about', element: <About /> },
+      { path: '/tools', element: <Tools /> },
+      { path: '/tools/:id', element: <Tool /> },
       // Anything that does not match above
       { path: '*', element: <NotFound /> },
     ],
@@ -72,6 +77,14 @@ const router = createBrowserRouter([
     element: (
       <AdminRoute>
         <AdminSubscribers />
+      </AdminRoute>
+    ),
+  },
+  {
+    path: '/admin/newsletters',
+    element: (
+      <AdminRoute>
+        <AdminNewsletter />
       </AdminRoute>
     ),
   },

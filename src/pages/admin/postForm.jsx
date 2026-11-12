@@ -24,6 +24,8 @@ const EMPTY_FORM = {
   status: 'draft',
   pinned: false,
   published_at: '', // local date and time for the date picker; empty = publish now
+  email_note: '', // your personal intro in the subscriber email
+  notify_subscribers: true, // email subscribers when the post goes live
 }
 
 // The date picker wants "YYYY-MM-DDTHH:mm" in the browser's own time zone.
@@ -102,6 +104,7 @@ export default function PostForm() {
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
+  const [notifiedAt, setNotifiedAt] = useState(null) // set once the subscriber email has gone out
 
   const contentRef = useRef(null)
   const imageInputRef = useRef(null)
@@ -130,7 +133,10 @@ export default function PostForm() {
             status: post.status ?? 'draft',
             pinned: post.pinned ?? false,
             published_at: toLocalInput(post.published_at),
+            email_note: post.email_note ?? '',
+            notify_subscribers: post.notify_subscribers ?? true,
           })
+          setNotifiedAt(post.notified_at ?? null)
           setSlugTouched(true) // do not change the slug of an existing post by accident
         }
       } catch (err) {
@@ -261,6 +267,8 @@ export default function PostForm() {
       status: form.status,
       // archived posts are never pinned
       pinned: form.status === 'archived' ? false : form.pinned,
+      email_note: form.email_note.trim() || null,
+      notify_subscribers: form.notify_subscribers,
     }
 
     // Only a published post uses the date. Empty = publish now, a future date = scheduled.
@@ -603,6 +611,47 @@ export default function PostForm() {
               <Button type="submit" disabled={saving || uploading} className="w-full">
                 {saveLabel}
               </Button>
+            </div>
+
+            <div className="card-soft space-y-4 p-6">
+              <h2 className="hand text-3xl leading-none">Email to subscribers</h2>
+
+              {notifiedAt ? (
+                <p className="rounded-lg bg-sage-soft px-3 py-2 text-sm text-emerald-700">
+                  Already emailed on{' '}
+                  {new Date(notifiedAt).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}.
+                  Changes here will not send it again.
+                </p>
+              ) : (
+                <>
+                  <label className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
+                    <input
+                      type="checkbox"
+                      checked={form.notify_subscribers}
+                      onChange={(e) => setField('notify_subscribers', e.target.checked)}
+                      className="size-4 accent-primary"
+                    />
+                    Email subscribers when this goes live
+                  </label>
+
+                  {form.notify_subscribers && (
+                    <Field label="Your personal intro" hint="(optional)" htmlFor="email_note">
+                      <textarea
+                        id="email_note"
+                        rows={4}
+                        maxLength={400}
+                        value={form.email_note}
+                        onChange={(e) => setField('email_note', e.target.value)}
+                        placeholder="A line or two, just for your readers..."
+                        className={textareaClass}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Add it before the post goes live. Once the email is sent, it can't be changed.
+                      </p>
+                    </Field>
+                  )}
+                </>
+              )}
             </div>
 
             <div className="card-soft p-6">

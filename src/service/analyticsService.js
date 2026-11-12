@@ -22,4 +22,29 @@ export class AnalyticsService {
   static share({ slug, platform }) {
     AnalyticsService.track('share', { slug, platform });
   }
+
+  /** A reader reached a step of a quiz tool (used to see where people stop). */
+  static quizStep({ tool, step, n }) {
+    AnalyticsService.track('quiz_step', { tool, step, n });
+  }
+
+  /** A reader finished a quiz and saw their result. */
+  static quizComplete({ tool, result }) {
+    AnalyticsService.track('quiz_complete', { tool, result });
+  }
+
+  /** A reader clicked the share button on a quiz result. */
+  static quizShare({ tool, result, method }) {
+    AnalyticsService.track('quiz_share', { tool, result, method });
+  }
+
+  /** A reader sent a star rating for a quiz. */
+  static quizFeedback({ tool, rating }) {
+    AnalyticsService.track('quiz_feedback', { tool, rating });
+  }
+
+  /** A reader subscribed from the box at the end of a quiz. */
+  static quizSubscribe({ tool }) {
+    AnalyticsService.track('quiz_subscribe', { tool });
+  }
 }

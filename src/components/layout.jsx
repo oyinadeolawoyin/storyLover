@@ -59,6 +59,7 @@ export default function Layout() {
   const links = [
     { to: '/', label: 'Home', active: pathname === '/' },
     { to: '/articles', label: 'Articles', active: articlesActive },
+    { to: '/tools', label: 'Quizzes', active: pathname.startsWith('/tools') },
     { to: '/about', label: 'About', active: pathname.startsWith('/about') },
   ]
 

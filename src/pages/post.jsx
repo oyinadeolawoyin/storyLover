@@ -1,25 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowRight, Check, Lightbulb, Link as LinkIcon } from 'lucide-react'
+import { ArrowRight, Lightbulb } from 'lucide-react'
 import { PostService } from '@/service/postService'
 import MarkdownContent from '@/components/markdownContent'
 import CategoryPill from '@/components/categoryPill'
-import {
-  BlueskyIcon,
-  FacebookIcon,
-  LinkedinIcon,
-  PinterestIcon,
-  ThreadsIcon,
-  TumblrIcon,
-  XIcon,
-} from '@/components/brandIcons'
-import AuthorCard from '@/components/authorCard'
+import ShareButtons from '@/components/shareButtons'
+import { Button } from '@/components/ui/button'
 import ArticleCard, { formatDate } from '@/components/articleCard'
 import SectionHeading from '@/components/sectionHeading'
 import Seo from '@/components/seo'
 import ErrorMessage from '@/components/errorMessage'
 import { PostSkeleton } from '@/components/skeletons'
 import SubscribeForm from '@/components/subscribeForm'
+import Comments from '@/components/comments'
 import { useReadTracking } from '@/hooks/useReadTracking'
 import { AnalyticsService } from '@/service/analyticsService'
 
@@ -36,6 +29,8 @@ export default function Post() {
   const [progress, setProgress] = useState(0)
   const [authorOk, setAuthorOk] = useState(true)
   const bodyRef = useRef(null)
+  const [toc, setToc] = useState([]) // headings found in the article body
+  const [activeId, setActiveId] = useState(null) // heading the reader is currently on
 
   useEffect(() => {
     let cancelled = false
@@ -103,6 +98,41 @@ export default function Post() {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
     }
+  }, [post])
+
+  // Table of contents: read the h2/h3 headings the markdown produced, give each an id, list them
+  useEffect(() => {
+    const root = bodyRef.current
+    if (!root) return
+    const nodes = Array.from(root.querySelectorAll('.article-body h2, .article-body h3'))
+    const used = new Set()
+    const items = nodes.map((node) => {
+      let id = node.id
+      if (!id) {
+        const base = slugify(node.textContent)
+        id = base
+        let n = 2
+        while (used.has(id) || document.getElementById(id)) id = `${base}-${n++}`
+        node.id = id
+      }
+      used.add(id)
+      node.classList.add('scroll-mt-24') // keeps the heading clear of the fixed header when jumped to
+      return { id, text: node.textContent, level: node.tagName === 'H3' ? 3 : 2 }
+    })
+    setToc(items)
+    setActiveId(items[0]?.id ?? null)
+
+    // Highlight the section being read
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActiveId(entry.target.id)
+        }
+      },
+      { rootMargin: '-90px 0px -70% 0px' }
+    )
+    nodes.forEach((n) => observer.observe(n))
+    return () => observer.disconnect()
   }, [post])
 
   // Analytics: counts the post as "read" when the reader reaches the end and stays long enough
@@ -209,6 +239,11 @@ export default function Post() {
             </blockquote>
           )}
 
+          {/* Phones and tablets: collapsible contents above the text (the sidebar one is desktop only) */}
+          <div className="mb-8 lg:hidden">
+            <TableOfContents items={toc} activeId={activeId} collapsible />
+          </div>
+
           <MarkdownContent className="article-body" content={post.content} />
 
           {/* Optional exercise */}
@@ -246,16 +281,61 @@ export default function Post() {
           {/* Analytics marker: when this scrolls into view the reader has reached the end */}
           <div ref={endRef} aria-hidden="true" />
 
-          {/* After the reading is done */}
-          <ShareBox title={post.title} excerpt={post.excerpt} image={post.cover_image} slug={post.slug} />
+          {/* Share, right at the bottom of the post */}
+          <div className="mt-10">
+            <ShareBox title={post.title} excerpt={post.excerpt} image={post.cover_image} slug={post.slug} />
+          </div>
         </div>
 
-        <aside className="min-w-0 space-y-6">
-          {/* On phones the share box at the end of the article is enough, so this one is desktop only */}
-          <div className="hidden lg:block">
-            <ShareCard title={post.title} excerpt={post.excerpt} image={post.cover_image} slug={post.slug} />
+        {/* Contents: desktop only, sticks under the header while the reader scrolls.
+            Phones get a collapsible one above the text instead. */}
+        <aside className="hidden min-w-0 lg:block">
+          <div className="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto">
+            <TableOfContents items={toc} activeId={activeId} />
           </div>
+        </aside>
+      </div>
 
+      {/* ---------- Comments: their own coloured band ---------- */}
+      <section className="bg-rose-soft/50 py-16">
+        <div className={container}>
+          <div className="mx-auto max-w-3xl">
+            <Comments postId={post.id} />
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- About the author: same look as the homepage strip ---------- */}
+      <section className="bg-butter-soft/70">
+        <div className={`${container} flex flex-col items-center gap-6 py-10 sm:flex-row`}>
+          {authorOk ? (
+            <img
+              src="/oyin.jpg"
+              alt="Oyin"
+              onError={() => setAuthorOk(false)}
+              className="size-28 shrink-0 rounded-full object-cover"
+            />
+          ) : (
+            <div className="hand flex size-28 shrink-0 items-center justify-center rounded-full bg-primary/20 text-5xl">
+              O
+            </div>
+          )}
+          <div className="text-center sm:text-left">
+            <h2 className="hand text-3xl">Hi, I'm Oyinade</h2>
+            <p className="mt-2 max-w-xl leading-relaxed text-foreground/80">
+              I'm a writer who studies storytelling, writes stories, and shares what I learn along the way.
+            </p>
+            <Button asChild variant="outline" className="mt-4 rounded-full border-sky text-sky hover:text-sky">
+              <Link to="/about">More about me</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- Related and next ---------- */}
+      {(related.length > 0 || next) && (
+      <section className={`${container} py-16`}>
+        <div className="grid items-start gap-6 md:grid-cols-2">
           {related.length > 0 && (
             <div className="card-soft p-6">
               <h2 className="hand text-3xl leading-none">Related articles</h2>
@@ -279,56 +359,13 @@ export default function Post() {
               </div>
             </div>
           )}
-
-          <AuthorCard />
-        </aside>
-      </div>
-
-      {/* ---------- End of the article ---------- */}
-      <section className={`${container} pb-16`}>
-        <div className="mb-8 text-center">
-          <p className="hand text-3xl text-foreground/80">You made it to the end. Thank you for reading!</p>
-          <p className="mt-3 text-sm text-foreground/70">
-            Have thoughts or questions about this post? Come talk to me on{' '}
-            <a
-              href="https://x.com/Tolageek"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-sky underline-offset-4 hover:underline"
-            >
-              X
-            </a>
-            ,{' '}
-            <a
-              href="https://www.instagram.com/oyinade_storylover/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-sky underline-offset-4 hover:underline"
-            >
-              Instagram
-            </a>
-            , or{' '}
-            <a
-              href="https://www.tumblr.com/oyinade-storylover"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-sky underline-offset-4 hover:underline"
-            >
-              Tumblr
-            </a>
-            {' '}— I’d love to hear from you.
-          </p>
         </div>
       </section>
-
-      {/* ---------- Newsletter ---------- */}
-      <section className={`${container} pb-16`}>
-        <SubscribeForm wide />
-      </section>
+      )}
 
       {/* ---------- More to read: a mix of categories ---------- */}
       {more.length > 0 && (
-        <section className={`${container} pb-16`}>
+        <section className={`${container} ${related.length > 0 || next ? 'pb-16' : 'py-16'}`}>
           <SectionHeading title="More to read" to="/articles" linkLabel="See all articles" />
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {more.map((m) => (
@@ -337,7 +374,79 @@ export default function Post() {
           </div>
         </section>
       )}
+
+      {/* ---------- Newsletter, last thing on the page ---------- */}
+      <section className={`${container} pb-16`}>
+        <SubscribeForm wide />
+      </section>
     </article>
+  )
+}
+
+function slugify(text) {
+  return (
+    text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-') || 'section'
+  )
+}
+
+function jumpToHeading(e, id) {
+  e.preventDefault()
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  window.history.replaceState(null, '', `#${id}`)
+}
+
+// Needs at least 2 headings to be worth showing.
+// Main headings (##) are numbered; sub-headings (###) sit indented under them.
+function TableOfContents({ items, activeId, collapsible = false }) {
+  if (items.length < 2) return null
+
+  let n = 0
+  const list = (
+    <ol className="border-l-2 border-border">
+      {items.map((item) => {
+        const active = activeId === item.id
+        const sub = item.level === 3
+        if (!sub) n += 1
+        return (
+          <li key={item.id}>
+            <a
+              href={`#${item.id}`}
+              onClick={(e) => jumpToHeading(e, item.id)}
+              className={`-ml-0.5 flex gap-2 border-l-2 py-2.5 pr-2 leading-snug transition-colors ${
+                sub ? 'pl-9 text-[13px]' : 'pl-4 text-sm font-semibold'
+              } ${
+                active
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-foreground/75 hover:text-foreground'
+              }`}
+            >
+              {!sub && <span className="shrink-0 text-muted-foreground">{n}.</span>}
+              <span>{item.text}</span>
+            </a>
+          </li>
+        )
+      })}
+    </ol>
+  )
+
+  if (collapsible) {
+    return (
+      <details className="card-soft p-5">
+        <summary className="hand cursor-pointer text-2xl leading-none">In this article</summary>
+        <div className="mt-4">{list}</div>
+      </details>
+    )
+  }
+
+  return (
+    <nav aria-label="Table of contents" className="card-soft p-6">
+      <h2 className="hand text-3xl leading-none">In this article</h2>
+      <div className="mt-5">{list}</div>
+    </nav>
   )
 }
 
@@ -361,177 +470,27 @@ function MiniArticle({ post }) {
 }
 
 // ---------- Sharing ----------
-// What every share carries: the post link (its slug), the title, the excerpt,
-// the tagline and #storyLoversCommunity. The cover image is sent to Pinterest directly;
-// on X, Facebook, LinkedIn, Threads and Bluesky the image comes from the page's Open Graph tags (see seo.jsx).
-const HASHTAG = '#storyLoversCommunity'
-const TAG_NAME = 'storyLoversCommunity' // the same tag without the # sign
-const TAGLINE = 'Create a story that moves your readers.'
-
-function clip(text, max) {
-  if (!text || max <= 0) return ''
-  if (text.length <= max) return text
-  return text.slice(0, Math.max(0, max - 1)).replace(/\s+\S*$/, '').trimEnd() + '…'
-}
-
-// title + excerpt + tail, trimmed so the whole thing fits the platform's limit.
-// The excerpt is the part that gets shortened. It is dropped if there is hardly any room.
-function compose({ title, excerpt, tail, max }) {
-  const t = clip(title, 120)
-  const room = max - t.length - tail.length - 4 // 4 = the two blank lines
-  const e = room >= 25 ? clip(excerpt, room) : ''
-  return [t, e, tail].filter(Boolean).join('\n\n')
-}
-
-// Shared by the sidebar card and the end-of-article box
-function useShare({ title, excerpt, image, slug }) {
-  const [copied, setCopied] = useState(false)
-  // The clean article address, built from the slug
-  const url = typeof window !== 'undefined' ? `${window.location.origin}/posts/${slug}` : ''
-  const enc = encodeURIComponent
-  const summary = excerpt ?? ''
-
-  // X: 280 characters, and the link always counts as about 23 of them
-  const xText = compose({ title, excerpt: summary, tail: `${TAGLINE}\n${HASHTAG}`, max: 280 - 24 })
-
-  // Bluesky: 300 characters and no separate link field, so the link goes inside the text
-  const blueskyText = compose({ title, excerpt: summary, tail: `${TAGLINE}\n${HASHTAG}\n${url}`, max: 300 })
-
-  // Threads: the link is attached as a card and the hashtag goes in as the post's topic tag
-  const threadsText = compose({ title, excerpt: summary, tail: TAGLINE, max: 450 })
-
-  const links = [
-    {
-      platform: 'facebook',
-      label: 'Share on Facebook',
-      // Facebook only takes the link (and a hashtag). The title, excerpt and image come from the page itself.
-      href: `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}&hashtag=${enc(HASHTAG)}`,
-      icon: FacebookIcon,
-    },
-    {
-      platform: 'x',
-      label: 'Share on X',
-      href: `https://twitter.com/intent/tweet?text=${enc(xText)}&url=${enc(url)}`,
-      icon: XIcon,
-    },
-    {
-      platform: 'linkedin',
-      label: 'Share on LinkedIn',
-      // LinkedIn only takes the link. The title, excerpt and image come from the page itself.
-      href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}`,
-      icon: LinkedinIcon,
-    },
-    {
-      platform: 'threads',
-      label: 'Share on Threads',
-      href: `https://www.threads.com/intent/post?text=${enc(threadsText)}&url=${enc(url)}&tag=${enc(TAG_NAME)}`,
-      icon: ThreadsIcon,
-    },
-    {
-      platform: 'bluesky',
-      label: 'Share on Bluesky',
-      href: `https://bsky.app/intent/compose?text=${enc(blueskyText)}`,
-      icon: BlueskyIcon,
-    },
-    {
-      platform: 'tumblr',
-      label: 'Share on Tumblr',
-      href:
-        `https://www.tumblr.com/widgets/share/tool?posttype=link&canonicalUrl=${enc(url)}` +
-        `&title=${enc(title)}&caption=${enc([summary, TAGLINE].filter(Boolean).join('\n\n'))}` +
-        `&tags=${enc(TAG_NAME)}`,
-      icon: TumblrIcon,
-    },
-  ]
-
-  // Pinterest needs a picture, so it only shows when the post has a cover image
-  if (image) {
-    const pinText = compose({ title, excerpt: summary, tail: `${TAGLINE} ${HASHTAG}`, max: 480 })
-    links.push({
-      platform: 'pinterest',
-      label: 'Pin on Pinterest',
-      href: `https://pinterest.com/pin/create/button/?url=${enc(url)}&media=${enc(image)}&description=${enc(pinText)}`,
-      icon: PinterestIcon,
-    })
-  }
-
-  async function copy() {
-    AnalyticsService.share({ slug, platform: 'copy-link' })
-    try {
-      await navigator.clipboard.writeText(url)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
-  return { links, copied, copy }
-}
-
-const roundBtn =
-  'flex size-10 items-center justify-center rounded-full bg-sky text-white transition-opacity hover:opacity-85'
-
-// Right panel, above Related articles
-function ShareCard({ title, excerpt, image, slug }) {
-  const { links, copied, copy } = useShare({ title, excerpt, image, slug })
-  return (
-    <div className="card-soft p-6">
-      <h2 className="hand text-3xl leading-none">Share this article</h2>
-      <div className="mt-4 flex flex-wrap gap-3">
-        {links.map(({ label, href, icon: Icon, platform }) => (
-          <a
-            key={label}
-            href={href}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={label}
-            className={roundBtn}
-            onClick={() => AnalyticsService.share({ slug, platform })}
-          >
-            <Icon className="size-4" />
-          </a>
-        ))}
-        <button onClick={copy} aria-label="Copy link" className={roundBtn}>
-          {copied ? <Check className="size-4" /> : <LinkIcon className="size-4" />}
-        </button>
-      </div>
-    </div>
-  )
-}
-
-// After the reading is done
+// The buttons live in components/shareButtons.jsx. This box only adds the message
+// around them and tells Umami which platform was clicked.
+// The cover image is sent to Pinterest directly; on the other platforms the image
+// comes from the page's Open Graph tags (see seo.jsx).
 function ShareBox({ title, excerpt, image, slug }) {
-  const { links, copied, copy } = useShare({ title, excerpt, image, slug })
+  // The clean article address, built from the slug
+  const url = `${window.location.origin}/posts/${slug}`
   return (
-    <section className="mt-12 rounded-xl border border-border bg-sky-soft p-6 text-center sm:p-8">
-      <h2 className="hand text-4xl leading-none">Know a writer who needs this?</h2>
-      <p className="mx-auto mt-3 max-w-md leading-relaxed text-foreground/80">
+    <section className="rounded-xl border border-border bg-sky-soft p-6 text-center sm:p-8">
+      <p className="mx-auto max-w-md leading-relaxed text-foreground/80">
         A friend or a fellow writer out there may be stuck on their story right now. Sharing this could be the help they need.
       </p>
 
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-        {links.map(({ label, href, icon: Icon, platform }) => (
-          <a
-            key={label}
-            href={href}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={label}
-            onClick={() => AnalyticsService.share({ slug, platform })}
-            className="flex size-11 items-center justify-center rounded-full bg-sky text-white transition-opacity hover:opacity-85"
-          >
-            <Icon className="size-4" />
-          </a>
-        ))}
-        <button
-          onClick={copy}
-          className="inline-flex h-11 items-center gap-2 rounded-full border border-sky bg-white px-5 text-sm font-semibold text-sky transition-colors hover:bg-sky hover:text-white"
-        >
-          {copied ? <Check className="size-4" /> : <LinkIcon className="size-4" />}
-          {copied ? 'Link copied' : 'Copy link'}
-        </button>
-      </div>
+      <ShareButtons
+        className="mt-6"
+        url={url}
+        title={title}
+        excerpt={excerpt}
+        image={image}
+        onShare={(platform) => AnalyticsService.share({ slug, platform })}
+      />
     </section>
   )
 }
