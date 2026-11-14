@@ -26,9 +26,9 @@ export default function ArticleCard({ post, variant = 'grid', className }) {
     return (
       <Link
         to={href}
-        className={cn('card-soft flex items-center gap-4 p-4 transition-shadow hover:shadow-md', className)}
+        className={cn('card-soft !rounded-none flex items-center gap-4 p-4 transition-shadow hover:shadow-md', className)}
       >
-        <div className="h-28 w-28 shrink-0 overflow-hidden rounded-lg sm:w-36">{image}</div>
+        <div className="h-28 w-28 shrink-0 overflow-hidden rounded-none sm:w-36">{image}</div>
         <div className="min-w-0">
           <CategoryPill category={post.category} />
           <h3 className="mt-2 line-clamp-3 break-words text-base font-semibold leading-snug sm:text-lg">
@@ -44,9 +44,9 @@ export default function ArticleCard({ post, variant = 'grid', className }) {
     return (
       <Link
         to={href}
-        className={cn('card-soft block overflow-hidden p-4 transition-shadow hover:shadow-md', className)}
+        className={cn('card-soft !rounded-none block overflow-hidden p-4 transition-shadow hover:shadow-md', className)}
       >
-        <div className="aspect-[16/10] overflow-hidden rounded-lg">{image}</div>
+        <div className="aspect-[16/10] overflow-hidden rounded-none">{image}</div>
         <div className="px-1 pb-2 pt-5">
           <CategoryPill category={post.category} />
           <h3 className="mt-3 text-2xl font-semibold leading-snug md:text-3xl">{post.title}</h3>
@@ -63,9 +63,9 @@ export default function ArticleCard({ post, variant = 'grid', className }) {
   return (
     <Link
       to={href}
-      className={cn('card-soft group flex flex-col overflow-hidden p-4 transition-shadow hover:shadow-md', className)}
+      className={cn('card-soft !rounded-none group flex flex-col overflow-hidden p-4 transition-shadow hover:shadow-md', className)}
     >
-      <div className="aspect-[16/10] overflow-hidden rounded-lg">{image}</div>
+      <div className="aspect-[16/10] overflow-hidden rounded-none">{image}</div>
       <div className="flex flex-1 flex-col px-1 pb-1 pt-5">
         <div>
           <CategoryPill category={post.category} />

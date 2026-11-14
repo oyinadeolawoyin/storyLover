@@ -15,7 +15,7 @@ export default function AuthorCard({ className }) {
   const [photoOk, setPhotoOk] = useState(true)
 
   return (
-    <div className={cn('overflow-hidden rounded-2xl border border-butter/30 bg-butter-soft', className)}>
+    <div className={cn('overflow-hidden rounded-none border border-butter/30 bg-butter-soft', className)}>
       {/* thin pink-to-blue band along the top */}
       <div className="h-1 bg-gradient-to-r from-primary via-primary/50 to-sky" />
 

@@ -95,7 +95,7 @@ export default function Articles() {
   // Category rows (right sidebar): small rectangles, a soft colour per category, solid when chosen
   const rowClass = (active, tone) =>
     cn(
-      'flex items-center justify-between rounded-md border px-4 py-2.5 text-[12px] font-bold uppercase tracking-[0.12em] transition-colors',
+      'flex items-center justify-between rounded-none border px-4 py-2.5 text-[12px] font-bold uppercase tracking-[0.12em] transition-colors',
       active ? tone.active : cn(tone.chip, 'text-foreground/85')
     )
   const countClass = (active) => cn('text-xs font-bold tabular-nums', active ? 'opacity-80' : 'text-muted-foreground')
@@ -106,7 +106,7 @@ export default function Articles() {
   // Category chips for small screens: one horizontal row you can swipe
   const chipClass = (active, tone) =>
     cn(
-      'flex shrink-0 items-center gap-2 whitespace-nowrap rounded-md border px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] transition-colors',
+      'flex shrink-0 items-center gap-2 whitespace-nowrap rounded-none border px-3 py-2 text-[11px] font-bold uppercase tracking-[0.12em] transition-colors',
       active ? tone.active : cn(tone.chip, 'text-foreground/85')
     )
 
@@ -118,7 +118,7 @@ export default function Articles() {
         onChange={(e) => setSearchInput(e.target.value)}
         placeholder="Search articles"
         aria-label="Search articles"
-        className="h-11 rounded-full bg-card pl-10"
+        className="h-11 rounded-none bg-card pl-10"
       />
     </form>
   )
@@ -188,7 +188,7 @@ export default function Articles() {
               <select
                 value={sort}
                 onChange={(e) => updateParams({ sort: e.target.value === 'newest' ? '' : e.target.value })}
-                className="rounded-full border border-input bg-card px-3 py-1.5 text-foreground"
+                className="rounded-none border border-input bg-card px-3 py-1.5 text-foreground"
               >
                 <option value="newest">Newest first</option>
                 <option value="oldest">Oldest first</option>
@@ -242,7 +242,7 @@ export default function Articles() {
           <div className="hidden lg:block">{searchBox}</div>
 
           {/* Categories */}
-          <div className="hidden rounded-xl border border-border bg-card p-5 shadow-soft lg:block">
+          <div className="hidden rounded-none border border-border bg-card p-5 shadow-soft lg:block">
             <h2 className="hand text-3xl leading-none">Categories</h2>
             <ul className="mt-4 space-y-2">
               <li>

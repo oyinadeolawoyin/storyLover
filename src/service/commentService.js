@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabase';
 
 // Only these columns are ever asked for. The email is never on a comment.
-const COLUMNS = 'id, reply_to_id, author_name, author_website, body, is_author, created_at, edited_at';
+const COLUMNS = 'id, reply_to_id, author_name, body, is_author, created_at, edited_at';
 
 // Keep only the public fields
 function toPublic(data) {
@@ -9,7 +9,6 @@ function toPublic(data) {
     id: data.id,
     reply_to_id: data.reply_to_id,
     author_name: data.author_name,
-    author_website: data.author_website,
     body: data.body,
     is_author: data.is_author,
     created_at: data.created_at,
@@ -32,18 +31,20 @@ export class CommentService {
   }
 
   /**
-   * Post a comment. Goes through the post_comment() database function, which also
-   * adds the person to the newsletter list if their email is new.
+   * Post a comment. Goes through the post_comment() database function.
+   * Email is optional and is NOT used to subscribe anyone. Name falls back to "Anonymous".
+   * editToken is a random secret made in the browser; the database keeps only its hash,
+   * and it is what lets an anonymous commenter edit their comment later.
    * Errors you can get: post_not_found, reply_target_missing, rate_limited.
    */
-  static async create({ postId, email, name, website = '', body, replyToId = null }) {
+  static async create({ postId, email = '', name = 'Anonymous', body, replyToId = null, editToken = null }) {
     const { data, error } = await supabase.rpc('post_comment', {
       p_post_id: postId,
-      p_email: email,
-      p_name: name,
-      p_website: website,
+      p_email: email || null,
+      p_name: name || 'Anonymous',
       p_body: body,
       p_reply_to: replyToId,
+      p_edit_token: editToken,
     });
 
     if (error) throw error;
@@ -52,13 +53,15 @@ export class CommentService {
   }
 
   /**
-   * Edit your own comment. The database checks that the email belongs to whoever wrote it.
+   * Edit your own comment. The database accepts either the edit token from when the comment
+   * was posted, or (for older comments) the email that wrote it.
    * Errors you can get: not_allowed.
    */
-  static async update({ id, email, body }) {
+  static async update({ id, email = '', editToken = '', body }) {
     const { data, error } = await supabase.rpc('edit_comment', {
       p_comment_id: id,
-      p_email: email,
+      p_email: email || null,
+      p_edit_token: editToken || null,
       p_body: body,
     });
 

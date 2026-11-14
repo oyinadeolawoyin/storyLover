@@ -223,7 +223,7 @@ export default function Post() {
             <img
               src={post.cover_image}
               alt=""
-              className="aspect-[4/3] w-full rounded-2xl object-cover shadow-soft"
+              className="aspect-[4/3] w-full rounded-none object-cover shadow-soft"
             />
           )}
         </div>
@@ -248,7 +248,7 @@ export default function Post() {
 
           {/* Optional exercise */}
           {post.exercise && (
-            <section className="mt-10 flex gap-4 rounded-xl border border-border bg-sky-soft p-6">
+            <section className="mt-10 flex gap-4 rounded-none border border-border bg-sky-soft p-6">
               <Lightbulb className="mt-1 size-7 shrink-0 text-sky" strokeWidth={1.5} />
               <div>
                 <h3 className="hand text-3xl leading-none">Try this</h3>
@@ -435,7 +435,7 @@ function TableOfContents({ items, activeId, collapsible = false }) {
 
   if (collapsible) {
     return (
-      <details className="card-soft p-5">
+      <details className="card-soft !rounded-none p-5">
         <summary className="hand cursor-pointer text-2xl leading-none">In this article</summary>
         <div className="mt-4">{list}</div>
       </details>
@@ -443,7 +443,7 @@ function TableOfContents({ items, activeId, collapsible = false }) {
   }
 
   return (
-    <nav aria-label="Table of contents" className="card-soft p-6">
+    <nav aria-label="Table of contents" className="card-soft !rounded-none p-6">
       <h2 className="hand text-3xl leading-none">In this article</h2>
       <div className="mt-5">{list}</div>
     </nav>
@@ -453,7 +453,7 @@ function TableOfContents({ items, activeId, collapsible = false }) {
 function MiniArticle({ post }) {
   return (
     <Link to={`/posts/${post.slug}`} className="group flex items-center gap-4">
-      <div className="size-16 shrink-0 overflow-hidden rounded-lg bg-muted">
+      <div className="size-16 shrink-0 overflow-hidden rounded-none bg-muted">
         {post.cover_image && (
           <img src={post.cover_image} alt="" loading="lazy" className="h-full w-full object-cover" />
         )}
@@ -478,8 +478,9 @@ function ShareBox({ title, excerpt, image, slug }) {
   // The clean article address, built from the slug
   const url = `${window.location.origin}/posts/${slug}`
   return (
-    <section className="rounded-xl border border-border bg-sky-soft p-6 text-center sm:p-8">
-      <p className="mx-auto max-w-md leading-relaxed text-foreground/80">
+    <section className="rounded-none border border-border bg-sky-soft p-6 text-center sm:p-8">
+      <h3 className="hand text-3xl leading-none">A writer might actually need this</h3>
+      <p className="mx-auto mt-4 max-w-md leading-relaxed text-foreground/80">
         A friend or a fellow writer out there may be stuck on their story right now. Sharing this could be the help they need.
       </p>
 

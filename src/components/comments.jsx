@@ -9,7 +9,6 @@ import {
   clearIdentity,
   loadIdentity,
   loadMyCommentIds,
-  normalizeWebsite,
   rememberMyComment,
   saveIdentity,
 } from '@/lib/commenterIdentity'
@@ -19,10 +18,33 @@ import {
 //  - a reply shows the comment it answers on top, with a curved line down to the reply
 //  - clicking that quoted comment scrolls up to it and flashes it
 //  - the box is at the bottom; "Reply" scrolls to it and quotes the comment
-//  - someone who is not on the list yet gives name + email (+ website, optional) the first time,
-//    and is subscribed by the same step
-//  - people can edit their own comments (the Edit button shows only in the browser that wrote it)
+//  - name and email are both optional; no name means "Anonymous", and commenting never subscribes anyone
+//  - people can edit their own comments (the Edit button shows only in the browser that wrote it;
+//    a secret edit token saved in that browser is what proves it to the database)
 //  - a link ending in #comment-<id> (like the ones in the notification emails) scrolls to that comment
+
+const ANONYMOUS = 'Anonymous'
+const TOKENS_KEY = 'comment_edit_tokens'
+
+function loadEditTokens() {
+  try {
+    return JSON.parse(localStorage.getItem(TOKENS_KEY)) || {}
+  } catch {
+    return {}
+  }
+}
+
+function getEditToken(commentId) {
+  return loadEditTokens()[commentId] || ''
+}
+
+function rememberEditToken(commentId, token) {
+  try {
+    localStorage.setItem(TOKENS_KEY, JSON.stringify({ ...loadEditTokens(), [commentId]: token }))
+  } catch {
+    // storage blocked: the comment still posts, it just cannot be edited later
+  }
+}
 
 const AVATAR_COLORS = ['bg-primary/20', 'bg-sky-soft', 'bg-butter-soft', 'bg-rose-soft']
 
@@ -147,9 +169,10 @@ export default function Comments({ postId }) {
 
   // Throws when it fails, so the comment's own edit box can show the message
   async function handleEdit(comment, text) {
-    const who = loadIdentity()
-    if (!who) throw new Error('not_allowed')
-    const updated = await CommentService.update({ id: comment.id, email: who.email, body: text })
+    const email = loadIdentity()?.email || ''
+    const editToken = getEditToken(comment.id)
+    if (!email && !editToken) throw new Error('not_allowed')
+    const updated = await CommentService.update({ id: comment.id, email, editToken, body: text })
     setComments((prev) => prev.map((c) => (c.id === updated.id ? { ...c, ...updated } : c)))
   }
 
@@ -340,18 +363,7 @@ function CommentItem({ comment, parent, highlighted, onReply, onJump, isAdmin, o
 
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5">
-            {comment.author_website ? (
-              <a
-                href={comment.author_website}
-                target="_blank"
-                rel="noopener noreferrer nofollow ugc"
-                className="font-semibold underline-offset-4 hover:text-primary hover:underline"
-              >
-                {comment.author_name}
-              </a>
-            ) : (
-              <span className="font-semibold">{comment.author_name}</span>
-            )}
+            <span className="font-semibold">{comment.author_name}</span>
             {comment.is_author && (
               <span className="rounded-full bg-sky/10 px-2 py-0.5 text-[10px] font-semibold uppercase leading-none tracking-wider text-sky ring-1 ring-sky/25">
                 Author
@@ -384,7 +396,7 @@ function CommentItem({ comment, parent, highlighted, onReply, onJump, isAdmin, o
                 maxLength={2000}
                 autoFocus
                 aria-label="Edit your comment"
-                className="block w-full resize-y rounded-xl border border-border bg-white px-4 py-3 text-[15px] leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky/40"
+                className="block w-full resize-y rounded-none border border-border bg-white px-4 py-3 text-[15px] leading-relaxed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky/40"
               />
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <Button
@@ -449,7 +461,6 @@ function Composer({ postId, replyTo, textareaRef, onCancelReply, onPosted, onSwi
   const [identity, setIdentity] = useState(() => loadIdentity())
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [website, setWebsite] = useState('')
   const [body, setBody] = useState('')
   const [trap, setTrap] = useState('') // hidden field: only bots fill it in
   const [sending, setSending] = useState(false)
@@ -468,14 +479,15 @@ function Composer({ postId, replyTo, textareaRef, onCancelReply, onPosted, onSwi
 
     let who = identity
     if (!who) {
-      const cleanName = name.trim()
+      const cleanName = name.trim() || ANONYMOUS
       const cleanEmail = email.trim().toLowerCase()
-      const cleanSite = normalizeWebsite(website)
-      if (!cleanName) return setMessage('Please tell us your name.')
-      if (!EMAIL_PATTERN.test(cleanEmail)) return setMessage('Please enter a valid email address.')
-      if (cleanSite === null) return setMessage('That website link does not look right. Leave it empty or try again.')
-      who = { name: cleanName, email: cleanEmail, website: cleanSite }
+      if (cleanEmail && !EMAIL_PATTERN.test(cleanEmail)) {
+        return setMessage('That email address does not look right. Leave it empty or try again.')
+      }
+      who = { name: cleanName, email: cleanEmail }
     }
+
+    const editToken = crypto.randomUUID()
 
     try {
       setSending(true)
@@ -483,11 +495,13 @@ function Composer({ postId, replyTo, textareaRef, onCancelReply, onPosted, onSwi
         postId,
         email: who.email,
         name: who.name,
-        website: who.website,
         body: text,
         replyToId: replyTo?.id ?? null,
+        editToken,
       })
-      if (!identity) {
+      rememberEditToken(comment.id, editToken)
+      // Only remember someone who actually gave a name or email; anonymous visitors see the optional fields again
+      if (!identity && (who.email || who.name !== ANONYMOUS)) {
         saveIdentity(who)
         setIdentity(who)
       }
@@ -503,7 +517,7 @@ function Composer({ postId, replyTo, textareaRef, onCancelReply, onPosted, onSwi
       } else if (err.message?.includes('post_not_found')) {
         setMessage('This post is no longer open for comments.')
       } else if (err.code === '23514') {
-        setMessage('Please check your name, email and website.')
+        setMessage('Please check your name and email.')
       } else {
         setMessage('Something went wrong. Please try again.')
       }
@@ -524,7 +538,7 @@ function Composer({ postId, replyTo, textareaRef, onCancelReply, onPosted, onSwi
   }
 
   return (
-    <form onSubmit={handleSubmit} className="relative rounded-2xl border border-border/70 bg-white p-5 shadow-soft sm:p-7">
+    <form onSubmit={handleSubmit} className="relative rounded-none border border-border/70 bg-white p-5 shadow-soft sm:p-7">
       {identity ? (
         <div className="mb-4 flex items-center gap-2.5 text-sm text-foreground/75">
           <Avatar name={identity.name} className="size-7 text-xs" />
@@ -544,42 +558,25 @@ function Composer({ postId, replyTo, textareaRef, onCancelReply, onPosted, onSwi
         </div>
       ) : (
         <div className="mb-4">
-          <p className="text-sm leading-relaxed text-foreground/75">
-            First time here? Tell us what to call you. Your email is never shown, and commenting also adds you to the
-            community list.
-          </p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2">
             <Input
               type="text"
-              placeholder="What should we call you?"
-              aria-label="Name"
+              placeholder="Name (optional)"
+              aria-label="Name (optional)"
               value={name}
               onChange={(e) => setName(e.target.value)}
               maxLength={60}
-              required
               autoComplete="given-name"
-              className="h-11 rounded-xl border-border bg-white px-4"
+              className="h-11 rounded-none border-border bg-white px-4"
             />
             <Input
               type="email"
-              placeholder="Email address"
-              aria-label="Email address"
+              placeholder="Email (optional)"
+              aria-label="Email (optional)"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
               autoComplete="email"
-              className="h-11 rounded-xl border-border bg-white px-4"
-            />
-            <Input
-              type="text"
-              inputMode="url"
-              placeholder="Your blog or site (optional)"
-              aria-label="Your blog or site (optional)"
-              value={website}
-              onChange={(e) => setWebsite(e.target.value)}
-              maxLength={200}
-              autoComplete="url"
-              className="h-11 rounded-xl border-border bg-white px-4 sm:col-span-2"
+              className="h-11 rounded-none border-border bg-white px-4"
             />
           </div>
         </div>
@@ -599,7 +596,7 @@ function Composer({ postId, replyTo, textareaRef, onCancelReply, onPosted, onSwi
 
       {/* Who this reply is for, like the bar above Discord's message box */}
       {replyTo && (
-        <div className="flex items-center gap-2 rounded-t-xl border border-b-0 border-border bg-rose-soft/50 px-3.5 py-2.5 text-xs">
+        <div className="flex items-center gap-2 rounded-none border border-b-0 border-border bg-rose-soft/50 px-3.5 py-2.5 text-xs">
           <Reply className="size-3.5 shrink-0 text-sky" />
           <span className="shrink-0 text-muted-foreground">Replying to</span>
           <strong className="shrink-0">{replyTo.author_name}</strong>
@@ -625,9 +622,8 @@ function Composer({ postId, replyTo, textareaRef, onCancelReply, onPosted, onSwi
         placeholder={replyTo ? `Reply to ${replyTo.author_name}` : 'Share your thoughts...'}
         aria-label="Your comment"
         className={cn(
-          'block w-full resize-y rounded-xl border border-border bg-white px-4 py-3.5 text-[15px] leading-7',
+          'block w-full resize-y rounded-none border border-border bg-white px-4 py-3.5 text-[15px] leading-7',
           'placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky/40',
-          replyTo && 'rounded-t-none'
         )}
       />
 

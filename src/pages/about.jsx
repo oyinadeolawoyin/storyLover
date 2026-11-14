@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { BookOpen, Bookmark, ChevronLeft, ChevronRight, Coffee, Star } from 'lucide-react'
+import { BookOpen, Bookmark, ChevronLeft, ChevronRight, Coffee, LayoutGrid, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { CategoryService } from '@/service/categoryService'
 import SectionHeading from '@/components/sectionHeading'
 import Seo from '@/components/seo'
 import Reveal from '@/components/reveal'
@@ -63,37 +64,19 @@ const FUN_FACTS = [
 
 const FACT_COLORS = ['bg-butter-soft', 'bg-sky-soft', 'bg-rose-soft', 'bg-sage-soft']
 
-// What readers will find on the site. Edit the text here.
-const FIND_HERE = [
-  {
-    to: '/articles',
-    title: 'Articles',
-    text: 'Practical ways to understand your story and write a first draft that works.',
-    icon: BookOpen,
-    bg: 'bg-rose-soft',
-  },
-  {
-    to: '/category/recommendations',
-    title: 'Recommendations',
+// "What you'll find here" is built from the categories that really exist (same as the home page),
+// plus an "All articles" card. A category's description from the database is used if it has one;
+// otherwise the text below (matched by slug). Colours repeat in order.
+const FIND_HERE_BGS = ['bg-rose-soft', 'bg-sky-soft', 'bg-butter-soft', 'bg-sage-soft']
+
+const CATEGORY_DETAILS = {
+  recommendations: {
     text: 'Books, films, stories and tools I have found helpful or just really loved.',
     icon: Bookmark,
-    bg: 'bg-sky-soft',
   },
-  {
-    to: '/category/reviews',
-    title: 'Reviews',
-    text: 'My honest takes on the stories I watch and read.',
-    icon: Star,
-    bg: 'bg-butter-soft',
-  },
-  {
-    to: '/category/off-the-page',
-    title: 'Off the Page',
-    text: 'Life beyond the writing.',
-    icon: Coffee,
-    bg: 'bg-sage-soft',
-  },
-]
+  reviews: { text: 'My honest takes on the stories I watch and read.', icon: Star },
+  'off-the-page': { text: 'Life beyond the writing.', icon: Coffee },
+}
 
 // One fun fact at a time. Each new card slides in from the side you are moving towards.
 // Works with the buttons, the dots, the left/right arrow keys, or a swipe on touch screens.
@@ -217,6 +200,16 @@ function FunFactsCarousel() {
 }
 
 export default function About() {
+  const [categories, setCategories] = useState([])
+  const [categoriesLoaded, setCategoriesLoaded] = useState(false)
+
+  useEffect(() => {
+    CategoryService.list()
+      .then(setCategories)
+      .catch((err) => console.error(err))
+      .finally(() => setCategoriesLoaded(true))
+  }, [])
+
   return (
     <div>
       <Seo
@@ -298,25 +291,44 @@ export default function About() {
       </section>
 
       {/* ---------- What you will find here ---------- */}
-      <section className="bg-sky-soft/50 py-12">
-        <div className={container}>
-          <SectionHeading title="What you'll find here" />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {FIND_HERE.map(({ to, title, text, icon: Icon, bg }) => (
+      {categoriesLoaded && (
+        <section className="bg-sky-soft/50 py-12">
+          <div className={container}>
+            <SectionHeading title="What you'll find here" />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {categories.map((c, i) => {
+                const details = CATEGORY_DETAILS[c.slug]
+                const Icon = details?.icon ?? BookOpen
+                const text = c.description || details?.text
+                return (
+                  <Link
+                    key={c.id}
+                    to={`/category/${c.slug}`}
+                    className={`${FIND_HERE_BGS[i % FIND_HERE_BGS.length]} flex flex-col rounded-xl border border-border p-6 transition-shadow hover:shadow-md`}
+                  >
+                    <Icon className="size-8 text-foreground/70" strokeWidth={1.5} />
+                    <h3 className="mt-4 text-xl font-semibold">{c.name}</h3>
+                    {text && <p className="mt-2 text-sm leading-relaxed text-foreground/75">{text}</p>}
+                    <span className="mt-auto pt-5 text-sm font-semibold text-sky">Take a look</span>
+                  </Link>
+                )
+              })}
+
               <Link
-                key={to}
-                to={to}
-                className={`${bg} flex flex-col rounded-xl border border-border p-6 transition-shadow hover:shadow-md`}
+                to="/articles"
+                className="flex flex-col rounded-xl border border-border bg-card p-6 transition-shadow hover:shadow-md"
               >
-                <Icon className="size-8 text-foreground/70" strokeWidth={1.5} />
-                <h3 className="mt-4 text-xl font-semibold">{title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-foreground/75">{text}</p>
-                <span className="mt-auto pt-5 text-sm font-semibold text-sky">Take a look</span>
+                <LayoutGrid className="size-8 text-foreground/70" strokeWidth={1.5} />
+                <h3 className="mt-4 text-xl font-semibold">All articles</h3>
+                <p className="mt-2 text-sm leading-relaxed text-foreground/75">
+                  Practical ways to understand your story and write a first draft that works.
+                </p>
+                <span className="mt-auto pt-5 text-sm font-semibold text-sky">Browse all</span>
               </Link>
-            ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ---------- Newsletter ---------- */}
       <section className={`${container} py-12`}>
