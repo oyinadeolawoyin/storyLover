@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { BookOpen, Brain, Lightbulb, LayoutGrid, Sparkles } from 'lucide-react'
+import { BookOpen, Brain, ChevronDown, Lightbulb, LayoutGrid, Sparkles } from 'lucide-react'
 import { PostService } from '@/service/postService'
 import { CategoryService } from '@/service/categoryService'
 import { Button } from '@/components/ui/button'
@@ -86,27 +86,46 @@ export default function Home() {
       <Seo />
 
       {/* ---------- 1. Greeting and intro ---------- */}
-      <section className="bg-gradient-to-b from-butter-soft via-butter-soft/60 to-background">
-        <div className={`${container} py-20 text-center md:py-28`}>
-          <h1 className="rise hand mx-auto max-w-4xl text-5xl leading-tight text-sky md:text-6xl">
+      <section className="relative overflow-hidden bg-gradient-to-b from-butter-soft via-butter-soft/50 to-background">
+        <style>{`
+          @keyframes hero-drift { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(24px, 18px); } }
+          .hero-drift { animation: hero-drift 12s ease-in-out infinite; }
+          .hero-drift-slow { animation: hero-drift 16s ease-in-out infinite reverse; }
+          @media (prefers-reduced-motion: reduce) {
+            .hero-drift, .hero-drift-slow { animation: none; }
+          }
+        `}</style>
+        {/* soft colour blobs, purely decorative */}
+        <div aria-hidden="true" className="hero-drift pointer-events-none absolute -left-24 top-10 size-72 rounded-full bg-rose-soft/70 blur-3xl" />
+        <div aria-hidden="true" className="hero-drift-slow pointer-events-none absolute -right-24 top-24 size-80 rounded-full bg-sky-soft/80 blur-3xl" />
+
+        <div className={`${container} relative pb-12 pt-20 text-center md:pb-16 md:pt-28`}>
+          <h1
+            className="rise hand mx-auto max-w-4xl text-5xl leading-[1.15] text-sky md:text-7xl"
+          >
             Are you tired of guessing why your story isn't working?
           </h1>
           <p
             className="rise mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-foreground/85 md:text-xl"
-            style={{ animationDelay: '150ms' }}
+            style={{ animationDelay: '200ms' }}
           >
-            Learn how to use the psychology of storytelling to hook your readers and keep them turning the pages.
+            Learn how to use the psychology of storytelling to{' '}
+            <strong className="font-semibold text-foreground">hook your readers</strong> and keep them turning the
+            pages.
           </p>
-          <div className="rise mt-10 flex flex-wrap justify-center gap-3" style={{ animationDelay: '300ms' }}>
-            <Button asChild size="lg" className="rounded-full px-7">
-              <Link to="/articles">Start reading</Link>
-            </Button>
-          </div>
+          <a
+            href="#hook"
+            aria-label="Scroll down"
+            className="rise mx-auto mt-10 flex size-11 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm transition-opacity hover:opacity-90"
+            style={{ animationDelay: '350ms' }}
+          >
+            <ChevronDown className="size-5 animate-bounce" />
+          </a>
         </div>
       </section>
 
       {/* ---------- 2. The hook + the sticky notes ---------- */}
-      <section className="py-14 md:py-20">
+      <section id="hook" className="scroll-mt-20 pb-14 pt-6 md:pb-20 md:pt-10">
         <div className={container}>
           <Reveal className="mx-auto max-w-3xl text-center">
             <p className="hand text-2xl text-sky">Did you know?</p>
@@ -286,7 +305,7 @@ export default function Home() {
               {authorOk ? (
                 <img
                   src="/oyin.jpg"
-                  alt="Oyin"
+                  alt="Oyinade"
                   onError={() => setAuthorOk(false)}
                   className="size-28 shrink-0 rounded-full object-cover"
                 />

@@ -222,73 +222,88 @@ export default function About() {
         </div>
       </section>
 
-      {/* ---------- My story, centred, each paragraph fades in as you scroll ---------- */}
+      {/* ---------- My story: opening line centred, then image + left-aligned text ---------- */}
       <section className={`${container} pb-16 pt-4 md:pb-24`}>
-        <div className="mx-auto max-w-2xl space-y-10 text-center">
+        <div className="mx-auto max-w-4xl">
           <Reveal>
-            <p className="font-heading text-2xl leading-relaxed text-foreground md:text-3xl">
+            <p className="mx-auto max-w-2xl text-center font-heading text-2xl leading-relaxed text-foreground md:text-3xl">
               I'm a mystery romance writer who loves exploring deep emotions, quiet moments, and the beauty of
               human connection.
             </p>
           </Reveal>
 
           <Reveal>
-            <div aria-hidden="true" className="mx-auto h-0.5 w-16 rounded-full bg-primary/60" />
+            <div aria-hidden="true" className="mx-auto my-10 h-0.5 w-16 rounded-full bg-primary/60" />
           </Reveal>
 
-          <Reveal>
-            <p className="text-lg leading-loose text-foreground/80 md:text-xl md:leading-loose">
-              I'm always curious about how stories work. How can we use science and psychology to pull readers
-              into a story world? How do we make readers root for our characters and cry with them? I love
-              searching for the answers and sharing what I discover with writers who are as passionate as I am.
-            </p>
-          </Reveal>
+          <div className="grid items-start gap-8 md:grid-cols-[260px_minmax(0,1fr)] md:gap-12">
+            <Reveal>
+              <img
+                src="/oyin.jpg"
+                alt="My notebook"
+                loading="lazy"
+                onError={(e) => (e.currentTarget.style.display = 'none')}
+                className="mx-auto w-56 rotate-[-2deg] rounded-xl border border-border object-cover shadow-md md:w-full"
+              />
+            </Reveal>
 
-          <Reveal>
-            <p className="text-lg leading-loose text-foreground/80 md:text-xl md:leading-loose">
-              What fascinates me most is how deeply stories are tied to human nature. As writers, we can use
-              stories to explore the darkest corners of the human heart, brighten someone's day, or simply help
-              someone see the world a little differently.
-            </p>
-          </Reveal>
+            <div className="space-y-5 text-left text-lg leading-relaxed text-foreground/80">
+              <Reveal>
+                <p>
+                  I started StoryLover so that stories could be the reason I connect with other writers. Here I
+                  share what I learn about how stories work, along with writing templates and{' '}
+                  <Link to="/tools" className="font-semibold text-sky underline-offset-4 hover:underline">
+                    quizzes
+                  </Link>{' '}
+                  to help you understand your own story.
+                </p>
+              </Reveal>
 
-          <Reveal>
-            <p className="text-lg leading-loose text-foreground/80 md:text-xl md:leading-loose">
-              I started StoryLover so that stories could be the reason I connect with other writers. Here I
-              share what I learn about how stories work, along with writing templates and{' '}
-              <Link to="/tools" className="font-semibold text-sky underline-offset-4 hover:underline">
-                quizzes
-              </Link>{' '}
-              to help you understand your own story.
-            </p>
-          </Reveal>
+              <Reveal>
+                <p>
+                  I'm always curious about how stories work. How can we use science and psychology to pull
+                  readers into a story world? How do we make readers root for our characters and cry with them? I
+                  love searching for the answers and sharing what I discover with writers who are as passionate as
+                  I am.
+                </p>
+              </Reveal>
 
-          <Reveal>
-            <p className="text-lg leading-loose text-foreground/80 md:text-xl md:leading-loose">
-              I'd love to hear why you love stories. Connect with me on{' '}
-              <a href="https://x.com/Tolageek" target="_blank" rel="noopener noreferrer" className="font-semibold text-sky underline-offset-4 hover:underline">
-                X
-              </a>
-              ,{' '}
-              <a href="https://www.instagram.com/oyinade_storylover/" target="_blank" rel="noopener noreferrer" className="font-semibold text-sky underline-offset-4 hover:underline">
-                Instagram
-              </a>{' '}
-              and{' '}
-              <a href="https://www.tumblr.com/oyinade-storylover" target="_blank" rel="noopener noreferrer" className="font-semibold text-sky underline-offset-4 hover:underline">
-                Tumblr
-              </a>
-              , or email me at{' '}
-              <a href="mailto:oyinadeolawoyin79@gmail.com" className="font-semibold text-sky underline-offset-4 hover:underline">
-                oyinadeolawoyin79@gmail.com
-              </a>
-              .
-            </p>
-            <p className="mt-6 text-lg leading-loose text-foreground/80 md:text-xl md:leading-loose">
-              Share your love of stories with the hashtag{' '}
-              <strong className="text-foreground">#StoryLoversCommunity</strong> on X, Tumblr, Instagram and
-              Threads.
-            </p>
-          </Reveal>
+              <Reveal>
+                <p>
+                  What fascinates me most is how deeply stories are tied to human nature. As writers, we can use
+                  stories to explore the darkest corners of the human heart, brighten someone's day, or simply
+                  help someone see the world a little differently.
+                </p>
+              </Reveal>
+
+              <Reveal>
+                <p>
+                  I'd love to hear why you love stories. Connect with me on{' '}
+                  <a href="https://x.com/Tolageek" target="_blank" rel="noopener noreferrer" className="font-semibold text-sky underline-offset-4 hover:underline">
+                    X
+                  </a>
+                  ,{' '}
+                  <a href="https://www.instagram.com/oyinade_storylover/" target="_blank" rel="noopener noreferrer" className="font-semibold text-sky underline-offset-4 hover:underline">
+                    Instagram
+                  </a>{' '}
+                  and{' '}
+                  <a href="https://www.tumblr.com/oyinade-storylover" target="_blank" rel="noopener noreferrer" className="font-semibold text-sky underline-offset-4 hover:underline">
+                    Tumblr
+                  </a>
+                  , or email me at{' '}
+                  <a href="mailto:oyinadeolawoyin79@gmail.com" className="font-semibold text-sky underline-offset-4 hover:underline">
+                    oyinadeolawoyin79@gmail.com
+                  </a>
+                  .
+                </p>
+                <p className="mt-4">
+                  Share your love of stories with the hashtag{' '}
+                  <strong className="text-foreground">#StoryLoversCommunity</strong> on X, Tumblr, Instagram and
+                  Threads.
+                </p>
+              </Reveal>
+            </div>
+          </div>
         </div>
       </section>
 
