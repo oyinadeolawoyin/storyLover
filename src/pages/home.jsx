@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, BookOpen, Brain, Lightbulb, LayoutGrid, Sparkles } from 'lucide-react'
+import { BookOpen, Brain, Lightbulb, LayoutGrid, Sparkles } from 'lucide-react'
 import { PostService } from '@/service/postService'
 import { CategoryService } from '@/service/categoryService'
 import { Button } from '@/components/ui/button'
@@ -12,6 +12,8 @@ import ErrorMessage from '@/components/errorMessage'
 import Reveal from '@/components/reveal'
 import { TeaserSkeleton } from '@/components/skeletons'
 import SubscribeForm from '@/components/subscribeForm'
+import QuizCallout from '@/components/quizCallout'
+import { isSubscribed } from '@/lib/subscriberStatus'
 
 const EXPLORE_STYLES = [
   { bg: 'bg-rose-soft', icon: BookOpen },
@@ -55,6 +57,8 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [authorOk, setAuthorOk] = useState(true)
+  // Already subscribed on an earlier visit? Then the quiz box above is enough, so skip the bottom form.
+  const [alreadySubscribed] = useState(() => isSubscribed())
 
   useEffect(() => {
     async function load() {
@@ -84,23 +88,18 @@ export default function Home() {
       {/* ---------- 1. Greeting and intro ---------- */}
       <section className="bg-gradient-to-b from-butter-soft via-butter-soft/60 to-background">
         <div className={`${container} py-20 text-center md:py-28`}>
-          <h1 className="rise hand text-5xl leading-tight text-sky md:text-7xl">
-            Hi, I'm so glad you're here.
+          <h1 className="rise hand mx-auto max-w-4xl text-5xl leading-tight text-sky md:text-6xl">
+            Are you tired of guessing why your story isn't working?
           </h1>
           <p
             className="rise mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-foreground/85 md:text-xl"
             style={{ animationDelay: '150ms' }}
           >
-            I'm Oyinade. I created this blog for fiction writers who are tired of guessing why a story isn't working
-            and want to use the psychology of storytelling to hook their readers and keep them turning
-            the pages.
+            Learn how to use the psychology of storytelling to hook your readers and keep them turning the pages.
           </p>
           <div className="rise mt-10 flex flex-wrap justify-center gap-3" style={{ animationDelay: '300ms' }}>
             <Button asChild size="lg" className="rounded-full px-7">
               <Link to="/articles">Start reading</Link>
-            </Button>
-            <Button asChild size="lg" variant="outline" className="rounded-full border-sky px-7 text-sky hover:text-sky">
-              <Link to="/about">About me</Link>
             </Button>
           </div>
         </div>
@@ -173,9 +172,8 @@ export default function Home() {
 
             <Reveal className="mt-10" delay={200}>
               <p className="text-lg leading-relaxed text-foreground/85 md:text-xl">
-                That's why I say <strong>story design</strong>, not story development. A story isn't
-                something you pile up. It's something you shape, the way a painter shapes a blank canvas,
-                choosing every colour, every shadow and every line on purpose.
+                Start seeing your story as a <strong>design</strong>: something you shape, the way a painter
+                shapes a blank canvas, choosing every colour, every shadow and every line on purpose.
               </p>
               <p className="hand mt-4 text-3xl text-sky md:text-4xl">You're the artist here. Enjoy it.</p>
             </Reveal>
@@ -240,21 +238,7 @@ export default function Home() {
 
           {/* ---------- 5. Quick win: the quizzes ---------- */}
           <section className={`${container} pb-14`}>
-            <Reveal className="rounded-2xl border border-border bg-rose-soft px-6 py-10 text-center sm:px-10 md:py-12">
-              <p className="hand text-2xl text-sky">A quick win</p>
-              <h2 className="mt-2 text-3xl font-bold leading-tight md:text-4xl">
-                Learn something new about your story
-              </h2>
-              <p className="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-foreground/80">
-                Check out my quizzes to help you uncover more about your story and your unique writing strengths.
-              </p>
-              <Button asChild size="lg" className="mt-7 rounded-full px-7">
-                <Link to="/tools">
-                  Take a quiz
-                  <ArrowRight className="size-4" />
-                </Link>
-              </Button>
-            </Reveal>
+            <QuizCallout />
           </section>
 
           {/* ---------- 6. Explore the blog ---------- */}
@@ -314,7 +298,7 @@ export default function Home() {
               <div className="text-center sm:text-left">
                 <h2 className="hand text-3xl">Hi, I'm Oyinade</h2>
                 <p className="mt-2 max-w-xl leading-relaxed text-foreground/80">
-                  I'm a writer who studies storytelling, writes stories, and shares what I learn along the way.
+                I’m a fiction writer who studies the psychology of storytelling — and I share what I learn to help you write stories that actually move readers.
                 </p>
                 <Button asChild variant="outline" className="mt-4 rounded-full border-sky text-sky hover:text-sky">
                   <Link to="/about">More about me</Link>
@@ -326,9 +310,11 @@ export default function Home() {
       )}
 
       {/* ---------- 8. Newsletter ---------- */}
-      <section className={`${container} py-14`}>
-        <SubscribeForm wide />
-      </section>
+      {!alreadySubscribed && (
+        <section className={`${container} py-14`}>
+          <SubscribeForm wide />
+        </section>
+      )}
     </div>
   )
 }

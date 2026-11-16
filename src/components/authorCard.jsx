@@ -44,7 +44,7 @@ export default function AuthorCard({ className }) {
         </div>
 
         <p className="mt-5 text-sm leading-relaxed text-foreground/80">
-          I study storytelling, write stories, and share what I learn along the way.
+        I’m a fiction writer who studies the psychology of storytelling — and I share what I learn to help you write stories that actually move readers.
         </p>
 
         <div className="mt-6 flex items-center justify-between border-t border-butter/40 pt-4">

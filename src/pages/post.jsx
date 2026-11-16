@@ -212,7 +212,7 @@ export default function Post() {
                     O
                   </span>
                 )}
-                By <strong className="text-foreground">Oyin</strong>
+                By <strong className="text-foreground">Oyinade</strong>
               </span>
               <span>{formatDate(post.published_at)}</span>
               <span>{post.read_minutes} min read</span>
@@ -311,7 +311,7 @@ export default function Post() {
           {authorOk ? (
             <img
               src="/oyin.jpg"
-              alt="Oyin"
+              alt="Oyinade"
               onError={() => setAuthorOk(false)}
               className="size-28 shrink-0 rounded-full object-cover"
             />
@@ -323,7 +323,7 @@ export default function Post() {
           <div className="text-center sm:text-left">
             <h2 className="hand text-3xl">Hi, I'm Oyinade</h2>
             <p className="mt-2 max-w-xl leading-relaxed text-foreground/80">
-              I'm a writer who studies storytelling, writes stories, and shares what I learn along the way.
+            I’m a fiction writer who studies the psychology of storytelling — and I share what I learn to help you write stories that actually move readers.
             </p>
             <Button asChild variant="outline" className="mt-4 rounded-full border-sky text-sky hover:text-sky">
               <Link to="/about">More about me</Link>

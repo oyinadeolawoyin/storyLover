@@ -14,51 +14,47 @@ const container = 'mx-auto max-w-7xl px-4 sm:px-6'
 const FUN_FACTS = [
   {
     title: 'Pen and paper first',
-    text: 'I write my stories by hand to find inspiration. If I stare at a blank screen, nothing comes. The funny part is that blog posts and articles flow fine on a keyboard.',
+    text: 'I write my stories by hand to find inspiration. When I stare at a blank screen, nothing comes. The funny part is that blog posts and articles flow just fine on a keyboard.',
   },
   {
     title: 'Flowers before chapters',
-    text: 'Before every chapter, I draw a few flowers at the top of my notebook page. It quiets my inner perfectionist so I can start.',
+    text: 'Before every chapter, I draw a few flowers at the top of my notebook page. It quiets my inner perfectionist and helps me begin.',
   },
   {
     title: 'Mystery, romance and a hidden identity',
-    text: 'I enjoy writing and reading mystery and romance. I love historical stories too. Hidden identity is my favourite trope.',
+    text: 'I love writing and reading mystery and romance, and historical stories too. Hidden identity is my favourite trope.',
   },
   {
     title: 'The book that changed everything',
-    text: "Story Genius by Lisa Cron was the first book that showed me how storytelling really works. She's still my favourite story coach.",
+    text: 'Story Genius by Lisa Cron was the first book that showed me how storytelling really works.',
   },
   {
     title: 'The story that gave me courage',
-    text: "I used to write scripts because they felt easier. Then I read Married to the Devil's Son by Jasmine Joseph, a paranormal romance web serial, and it gave me the courage to try prose.",
+    text: "I used to write scripts because they felt easier. Then I read Married to the Devil's Son by Jasmine Joseph, a paranormal romance web serial, and it gave me the courage to try writing prose.",
   },
   {
-    title: 'My favourites',
-    text: "Kate Noble and Gillian Flynn are my favourite authors, and my favourite colour is blue.",
+    title: 'My favourite colour',
+    text: 'My favourite colour is blue. You might have noticed it all around this blog.',
   },
   {
-    title: 'Crying over fictional people',
-    text: 'I love Indian films and K-dramas. I love how they can make their characters feel so real and get me completely invested in them.',
+    title: 'Hooked on characters',
+    text: 'I love K-dramas, Japanese movies and Indian movies. They make their characters feel so real that I get completely invested in them.',
   },
   {
     title: 'Music came first',
-    text: "Music was my first passion. I love hip hop, Afrobeats and especially guitar music. I write songs sometimes (my voice is not great). I wanted to become a musician before I wanted to become a writer.",
+    text: "Music was my first passion. I still write songs sometimes (my voice isn't that great). I wanted to be a musician before I wanted to be a writer.",
   },
   {
     title: 'Desk goblin',
     text: "I'm an introvert who spends a lot of time in my head and at my desk. Cameras are not my thing.",
   },
   {
-    title: 'Writer with no rhythm',
-    text: "I'm not really good at dancing, but I really admire people who can dance well.",
-  },
-  {
     title: 'The fourth of five',
-    text: "I'm the fourth child in my family, with two older sisters, an older brother and a younger brother. My family gives me the motivation and courage to keep going.",
+    text: "I'm the fourth of five children, with two older sisters, an older brother and a younger brother. My family gives me the motivation and courage to keep going.",
   },
   {
     title: 'May 20',
-    text: "I was born on May 20. I'm a very shy person.",
+    text: "I was born on May 20. I'm also a very shy person.",
   },
 ]
 
@@ -258,6 +254,17 @@ export default function About() {
 
           <Reveal>
             <p className="text-lg leading-loose text-foreground/80 md:text-xl md:leading-loose">
+              I started StoryLover so that stories could be the reason I connect with other writers. Here I
+              share what I learn about how stories work, along with writing templates and{' '}
+              <Link to="/tools" className="font-semibold text-sky underline-offset-4 hover:underline">
+                quizzes
+              </Link>{' '}
+              to help you understand your own story.
+            </p>
+          </Reveal>
+
+          <Reveal>
+            <p className="text-lg leading-loose text-foreground/80 md:text-xl md:leading-loose">
               I'd love to hear why you love stories. Connect with me on{' '}
               <a href="https://x.com/Tolageek" target="_blank" rel="noopener noreferrer" className="font-semibold text-sky underline-offset-4 hover:underline">
                 X
@@ -271,8 +278,8 @@ export default function About() {
                 Tumblr
               </a>
               , or email me at{' '}
-              <a href="mailto:oyinadeolawoyin72@gmail.com" className="font-semibold text-sky underline-offset-4 hover:underline">
-                oyinadeolawoyin72@gmail.com
+              <a href="mailto:oyinadeolawoyin79@gmail.com" className="font-semibold text-sky underline-offset-4 hover:underline">
+                oyinadeolawoyin79@gmail.com
               </a>
               .
             </p>
@@ -294,7 +301,7 @@ export default function About() {
       {categoriesLoaded && (
         <section className="bg-sky-soft/50 py-12">
           <div className={container}>
-            <SectionHeading title="What you'll find here" />
+            <SectionHeading title="Articles by category" />
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {categories.map((c, i) => {
                 const details = CATEGORY_DETAILS[c.slug]

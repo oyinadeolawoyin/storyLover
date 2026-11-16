@@ -198,7 +198,7 @@ export default function Comments({ postId }) {
             <MessageCircle className="size-5" strokeWidth={1.6} />
           </span>
           <h2 id="comments-title" className="hand text-4xl leading-none">
-            Share your thoughts
+            Have thoughts about this article? I’d love to hear from you.
           </h2>
         </div>
         {!loading && !failed && count > 0 && (
@@ -469,7 +469,8 @@ function Composer({ postId, replyTo, textareaRef, onCancelReply, onPosted, onSwi
   async function handleSubmit(e) {
     e?.preventDefault()
     setMessage('')
-    if (trap) return // a bot: do nothing
+    // A bot filled the hidden field. If an autofill ever does it by mistake, a real person still sees a message.
+    if (trap) return setMessage('Something went wrong. Please try again.')
 
     const text = body.trim()
     if (!text) {
@@ -585,11 +586,13 @@ function Composer({ postId, replyTo, textareaRef, onCancelReply, onPosted, onSwi
       {/* Hidden trap field for bots. Real visitors never see it. */}
       <input
         type="text"
-        name="company"
+        name="hp_check"
         value={trap}
         onChange={(e) => setTrap(e.target.value)}
         tabIndex={-1}
-        autoComplete="off"
+        autoComplete="nope"
+        data-lpignore="true"
+        data-1p-ignore="true"
         aria-hidden="true"
         style={{ position: 'absolute', left: '-9999px' }}
       />

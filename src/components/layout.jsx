@@ -151,10 +151,10 @@ export default function Layout() {
               ))}
             </div>
             <a
-              href="mailto:oyinadeolawoyin72@gmail.com"
+              href="mailto:oyinadeolawoyin79@gmail.com"
               className="mt-4 inline-block break-all text-sm text-foreground/75 hover:text-primary"
             >
-              oyinadeolawoyin72@gmail.com
+              oyinadeolawoyin79@gmail.com
             </a>
           </div>
         </div>
